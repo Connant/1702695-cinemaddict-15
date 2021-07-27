@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Daria Selezneva](https://up.htmlacademy.ru/ecmascript/15/user/1702695).
-* Наставник: `Неизвестно`.
+* Наставник: [Евгений Фаллер](https://htmlacademy.ru/profile/id505933).
 
 ---
 
