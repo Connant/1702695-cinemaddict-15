@@ -1,3 +1,5 @@
+import { createElement } from '../mock/utilts.js';
+
 export const createSortTemplate = () => (
   `<ul class="sort">
       <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
@@ -6,3 +8,24 @@ export const createSortTemplate = () => (
     </ul>`
 );
 
+export default class Sorting {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createSortTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

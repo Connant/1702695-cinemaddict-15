@@ -1,3 +1,4 @@
+import { createElement } from '../mock/utilts.js';
 
 export const menuTemplate = (movies) => {
   let watchlist = 0;
@@ -25,3 +26,26 @@ export const menuTemplate = (movies) => {
   <li><a href="#" class="sort__button">Sort by rating</a></li>
 </ul>`;
 };
+
+export default class Menu {
+  constructor(card) {
+    this._card = card;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return menuTemplate(this._card);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

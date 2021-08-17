@@ -1,3 +1,5 @@
+import { createElement } from '../mock/utilts.js';
+
 export const createFilmsContainerTemplate = () => (
   `<section class="films">
     <section class="films-list">
@@ -17,3 +19,25 @@ export const createFilmsContainerTemplate = () => (
     </section>
   </section>`
 );
+
+export default class MoviesContainer {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmsContainerTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
