@@ -42,3 +42,10 @@ export const generateDate = () => {
   const hoursGap =  getRandomInt(-12,12);
   return dayjs().add(daysGap, 'day').add(yearsGap, 'year').add(hoursGap, 'hour').toDate();
 };
+
+export const createElement = (template) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};

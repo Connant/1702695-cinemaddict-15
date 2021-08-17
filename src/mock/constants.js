@@ -66,10 +66,6 @@ export const LOREM_IPSUM_DESCRIPTIONS = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
-
-// export const ORIGINAL_MOVIE_TITLES = [
-// ];
-
 export const DIRECTORS = [
   'Anthony Mann',
   'Victor Fleming',
@@ -106,4 +102,9 @@ export const FILM_PRODUCTION_COUNTRY = [
 
 export const MAX_LENGTH_DESCRIPTION = 140;
 
-export const COMMENT_EMOJI = ['smile', 'sleeping', 'vomit', 'angry'];
+export const EMOJI = [
+  'images/emoji/angry.png',
+  'images/emoji/puke.png',
+  'images/emoji/sleeping.png',
+  'images/emoji/smile.png',
+];
