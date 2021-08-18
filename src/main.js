@@ -3,11 +3,14 @@ import MoviesContainer from './view/films-container';
 // import FilmSection from './view/films.js';
 // import Menu from './view/menu.js';
 import Card from './view/movie-card';
+import NoMovies from './view/no-movies.js';
 import Popup from './view/popup';
 import Button from './view/show-more-button';
 import Sorting from './view/sort';
 import UserRunk from './view/user-rank';
 import { generateMovieCard } from './mock/fake-card.js';
+
+import { isEscEvent } from './mock/utilts.js';
 
 
 const renderPosition = {
@@ -43,10 +46,19 @@ const onClosePopup = () => {
   popupClose.removeEventListener('click', onClosePopup);
 };
 
+const onEscKeydown = (evt) => {
+  if (isEscEvent(evt)) {
+    evt.preventDefault();
+    onClosePopup();
+    document.removeEventListener('keydown', onEscKeydown);
+  }
+};
+
 const onFilmCardClick = () => {
   bodyElement.appendChild(popupElement);
   bodyElement.classList.add('hide-overflow');
   popupClose.addEventListener('click', onClosePopup);
+  document.addEventListener('keydown', onEscKeydown);
 };
 
 
@@ -68,6 +80,10 @@ const renderCard = (cardsContainer, card) => {
 render(headerElement, new UserRunk().getElement(), renderPosition.BEFOREEND);
 // render(mainElement, new Menu().getElement(), renderPosition.BEFOREEND);
 // render(mainElement, new FilmSection().getElement(), renderPosition.BEFOREEND);
+
+// todo я не понимаю, почему следущая строка вызывает ошибку (предыдущие две тоже выдают такую же ошибку)
+
+render(mainElement, new NoMovies().getElement(), renderPosition.BEFOREEND);
 render(mainElement, new Sorting().getElement(), renderPosition.BEFOREEND);
 render(mainElement, new MoviesContainer().getElement(), renderPosition.BEFOREEND);
 
