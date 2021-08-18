@@ -49,3 +49,9 @@ export const createElement = (template) => {
 
   return newElement.firstChild;
 };
+
+
+// export const ESC_IE = 'Esc';
+//  export const ESC_ALL_BROWSERS = 'Escape';
+
+export const isEscEvent = (evt) => evt.key === 'Esc' || evt.key === 'Escape';
