@@ -1,4 +1,4 @@
-import { createElement } from '../mock/utilts.js';
+import Abstract from '../mock/abstract.js';
 
 export const menuTemplate = (movies) => {
   let watchlist = 0;
@@ -27,25 +27,13 @@ export const menuTemplate = (movies) => {
 </ul>`;
 };
 
-export default class Menu {
-  constructor(card) {
-    this._card = card;
-    this._element = null;
+export default class Menu extends Abstract {
+  constructor(films) {
+    super();
+    this._filters = films;
   }
 
   getTemplate() {
-    return menuTemplate(this._card);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    return menuTemplate(this._filters);
   }
 }

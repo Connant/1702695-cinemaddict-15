@@ -1,4 +1,4 @@
-import { createElement } from '../mock/utilts.js';
+import Abstract from '../mock/abstract.js';
 
 export const createSortTemplate = () => (
   `<ul class="sort">
@@ -8,24 +8,9 @@ export const createSortTemplate = () => (
     </ul>`
 );
 
-export default class Sorting {
-  constructor() {
-    this._element = null;
-  }
-
+export default class Sorting extends Abstract {
   getTemplate() {
     return createSortTemplate();
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
 }
+

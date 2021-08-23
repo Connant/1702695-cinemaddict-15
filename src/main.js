@@ -12,22 +12,8 @@ import { generateMovieCard } from './mock/fake-card.js';
 
 import { isEscEvent } from './mock/utilts.js';
 
+import { render, renderPosition } from './mock/render.js';
 
-const renderPosition = {
-  AFTERBEGIN: 'afterbegin',
-  BEFOREEND: 'beforeend',
-};
-
-const render = (container, element, place = 'beforeend') => {
-  switch (place) {
-    case renderPosition.AFTERBEGIN:
-      container.prepend(element);
-      break;
-    case renderPosition.BEFOREEND:
-      container.append(element);
-      break;
-  }
-};
 
 const MOVIE_CARDS_COUNT = 5;
 const movieCards = new Array(MOVIE_CARDS_COUNT).fill().map(generateMovieCard);
@@ -83,7 +69,7 @@ render(headerElement, new UserRunk().getElement(), renderPosition.BEFOREEND);
 
 // todo я не понимаю, почему следущая строка вызывает ошибку (предыдущие две тоже выдают такую же ошибку)
 
-render(mainElement, new NoMovies().getElement(), renderPosition.BEFOREEND);
+// render(mainElement, new NoMovies().getElement(), renderPosition.BEFOREEND);
 render(mainElement, new Sorting().getElement(), renderPosition.BEFOREEND);
 render(mainElement, new MoviesContainer().getElement(), renderPosition.BEFOREEND);
 

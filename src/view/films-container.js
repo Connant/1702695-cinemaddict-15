@@ -1,4 +1,4 @@
-import { createElement } from '../mock/utilts.js';
+import Abstract from '../mock/abstract.js';
 
 export const createFilmsContainerTemplate = () => (
   `<section class="films">
@@ -20,24 +20,8 @@ export const createFilmsContainerTemplate = () => (
   </section>`
 );
 
-export default class MoviesContainer {
-  constructor() {
-    this._element = null;
-  }
-
+export default class MoviesContainer extends Abstract {
   getTemplate() {
     return createFilmsContainerTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
