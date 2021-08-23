@@ -68,8 +68,8 @@ render(headerElement, new UserRunk().getElement(), renderPosition.BEFOREEND);
 // render(mainElement, new FilmSection().getElement(), renderPosition.BEFOREEND);
 
 // todo я не понимаю, почему следущая строка вызывает ошибку (предыдущие две тоже выдают такую же ошибку)
+render(mainElement, new NoMovies().getElement(), renderPosition.BEFOREEND);
 
-// render(mainElement, new NoMovies().getElement(), renderPosition.BEFOREEND);
 render(mainElement, new Sorting().getElement(), renderPosition.BEFOREEND);
 render(mainElement, new MoviesContainer().getElement(), renderPosition.BEFOREEND);
 
@@ -105,8 +105,7 @@ if (movieCards.length > MOVIE_CARDS_COUNT) {
 
   render(filmsList, new Button().getElement(), renderPosition.BEFOREEND);
 
-  showMoreButton.addEventListener('click', (evt) => {
-    evt.preventDefault();
+  showMoreButton.setClickHandler(() => {
     movieCards
       .slice(cardCount, cardCount + MOVIE_CARDS_COUNT)
       .forEach((card) => renderCard(filmsListContainer, card));
