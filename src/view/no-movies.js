@@ -1,4 +1,4 @@
-import Abstract from '../mock/abstract.js';
+import Abstract from './abstract.js';
 
 const noMoviesTemplate = () => (
   `<section class="films">

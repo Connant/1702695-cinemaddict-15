@@ -1,7 +1,3 @@
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
-// https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Math/ceil
-// https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Math/floor
-
 import dayjs from 'dayjs';
 
 export const getRandomInt = (firstNumber = 0, secondNumber = 1) => {
@@ -27,10 +23,6 @@ export const getRandomDescription = (items) => {
   return randomDescription;
 };
 
-
-// todo https://day.js.org/docs/en/display/format
-// todo https://www.codegrepper.com/code-examples/javascript/dayjs+format
-
 export const formatReleaseDate = (releaseDate) => dayjs(releaseDate).format('DD MM YYYY');
 
 export const formatRuntime = (runtime) => `${Math.floor(runtime / 60)}h ${runtime % 60}m`;
@@ -49,9 +41,5 @@ export const createElement = (template) => {
 
   return newElement.firstChild;
 };
-
-
-// export const ESC_IE = 'Esc';
-//  export const ESC_ALL_BROWSERS = 'Escape';
 
 export const isEscEvent = (evt) => evt.key === 'Esc' || evt.key === 'Escape';

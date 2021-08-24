@@ -1,4 +1,4 @@
-import Abstract from '../mock/abstract.js';
+import Abstract from './abstract.js';
 
 export const showMoreButtonTemplate = () => (
   `
@@ -19,5 +19,10 @@ export default class Button extends Abstract {
   _clickHandler(evt) {
     evt.preventDefault();
     this._callback.click();
+  }
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().addEventListener('click', this._clickHandler);
   }
 }

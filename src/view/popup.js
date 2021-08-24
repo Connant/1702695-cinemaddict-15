@@ -1,5 +1,5 @@
-import { formatReleaseDate, formatRuntime } from '../mock/utilts.js';
-import Abstract from '../mock/abstract.js';
+import { formatReleaseDate, formatRuntime } from '../utils/utilts.js';
+import Abstract from './abstract.js';
 
 export const popupTemplate = (movie) => {
   const watchlistName = movie.userDetails.watchlist ? 'film-details__control-button--active' : '';

@@ -1,4 +1,4 @@
-import Abstract from '../mock/abstract.js';
+import Abstract from './abstract.js';
 
 export const userRunkTemplate = () => (
   `<section class="header__profile profile">
