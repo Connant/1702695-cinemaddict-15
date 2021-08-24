@@ -1,5 +1,5 @@
-import { formatRuntime } from '../mock/utilts.js';
-import { createElement } from '../mock/utilts.js';
+import { formatRuntime } from '../utils/utilts.js';
+import Abstract from './abstract.js';
 
 export const createMovieCardTemplate = (card) => {
   const { movieInfo, userDetails } = card;
@@ -31,26 +31,26 @@ export const createMovieCardTemplate = (card) => {
   </article>`;
 };
 
-export default class Card {
+export default class Card extends Abstract {
   constructor(card) {
+    super();
     this._card = card;
-    this._element = null;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createMovieCardTemplate(this._card);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
+  _clickHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.className === 'film-card__poster') {
+      this._callback.click();
     }
-
-    return this._element;
   }
 
-  removeElement() {
-    this._element = null;
+  setClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().addEventListener('click', this._clickHandler);
   }
 }
-

@@ -11,13 +11,13 @@ import {
   FILM_PRODUCTION_COUNTRY,
   MAX_LENGTH_DESCRIPTION,
   EMOJI
-} from './constants';
+} from '../constants';
 
 import {
   getRandomInt,
   getRandomFloat, getRandomItem,
   getRandomDescription, formatRuntime, generateDate
-} from './utilts.js';
+} from '../utils/utilts.js';
 
 import dayjs from 'dayjs';
 

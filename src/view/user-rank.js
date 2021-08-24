@@ -1,4 +1,4 @@
-import { createElement } from '../mock/utilts.js';
+import Abstract from './abstract.js';
 
 export const userRunkTemplate = () => (
   `<section class="header__profile profile">
@@ -7,24 +7,8 @@ export const userRunkTemplate = () => (
 </section>`
 );
 
-export default class UserRunk {
-  constructor() {
-    this._element = null;
-  }
-
+export default class UserRunk extends Abstract {
   getTemplate() {
     return userRunkTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
