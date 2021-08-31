@@ -1,12 +1,11 @@
-import { render, renderPosition, remove, replace, isEscape } from '../utils/render.js';
-import Film from '../view/film.js';
+import { render, renderPosition, remove, replace, isEscEvent } from '../utils/utilts.js';
+import Card from '../view/movie-card';
 import Popup from '../view/popup.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
   POPUP: 'POPUP',
 };
-
 
 export default class Movie {
   constructor(container, changeData, changeMode) {
@@ -26,7 +25,6 @@ export default class Movie {
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleHistoryClick = this._handleHistoryClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
-
   }
 
   init(film) {
@@ -35,7 +33,7 @@ export default class Movie {
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
 
-    this._filmComponent = new Film(film);
+    this._filmComponent = new Card(film);
     this._popupComponent = new Popup(film);
 
 
@@ -45,16 +43,16 @@ export default class Movie {
     this._filmComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     this._popupComponent.setClickHandler(this._clickClose);
-    this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._popupComponent.setAlreadyWatchedClickHandler(this._handleHistoryClick);
+    this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     if (prevFilmComponent === null || prevPopupComponent === null) {
-      render(this._filmListElement, this._filmComponent, renderPosition.BEFOREEND);
+      render(this._container, this._filmComponent, renderPosition.BEFOREEND);
       return;
     }
 
-    if (this._filmListElement.getElement().contains((prevFilmComponent.getElement())) && this._mode === Mode.DEFAULT) {
+    if (this._container.getElement().contains((prevFilmComponent.getElement())) && this._mode === Mode.DEFAULT) {
       replace(this._filmComponent, prevFilmComponent);
 
     }
@@ -75,7 +73,7 @@ export default class Movie {
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
-      this._closePopupFilm();
+      this._onClosePopup();
     }
   }
 
@@ -130,7 +128,7 @@ export default class Movie {
   }
 
   _clickClose() {
-    this._closePopupFilm();
+    this._onClosePopup();
     document.removeEventListener('keydown', this._onEscKeyDown);
   }
 
@@ -148,9 +146,9 @@ export default class Movie {
   }
 
   _onEscKeyDown(evt) {
-    if (isEscape(evt)) {
+    if (isEscEvent(evt)) {
       evt.preventDefault();
-      this._closePopupFilm();
+      this._onClosePopup();
       document.removeEventListener('keydown', this._onEscKeyDown);
     }
   }

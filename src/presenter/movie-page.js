@@ -6,7 +6,9 @@ import Button from '../view/show-more-button.js';
 import Sorting from '../view/sort.js';
 
 import { render, renderPosition, updateItem, topSortFunction, commentedSortFunction, remove } from '../utils/utilts.js';
-import { MOVIE_CARDS_COUNT, TOPRATED_MOVIES, MOST_COMMENTED_FILMS } from '../mock/fake-card.js';
+import { MOVIE_CARDS_COUNT, TOPRATED_MOVIES_COUNT, MOST_COMMENTED_FILMS } from '../mock/fake-card.js';
+
+import Movie from './movie.js';
 
 
 export default class Page {
@@ -19,6 +21,7 @@ export default class Page {
     this._noMovies = new NoMovies();
     this._sortFilms = new Sorting();
     this._filmPresenter = new Map();
+
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
@@ -48,7 +51,7 @@ export default class Page {
   }
 
   _renderFilm(filmListElement, film) {
-    const filmPresenter = new Card(filmListElement, this._handleFilmChange, this._handleModeChange);
+    const filmPresenter = new Movie(filmListElement, this._handleFilmChange, this._handleModeChange);
     filmPresenter.init(film);
     this._filmPresenter.set(film.id, filmPresenter);
   }
@@ -77,16 +80,15 @@ export default class Page {
   }
 
   _renderShowMoreButton() {
-    render(this._movieCard, this._showMoreButton, renderPosition.BEFOREEND);
+    const filmsContainer = this._mainElement.querySelector('.films');
+    const filmsList = filmsContainer.querySelector('.films-list');
+    render(filmsList, this._showMoreButton, renderPosition.BEFOREEND);
     this._showMoreButton.setClickHandler(this._handleShowMoreButtonClick);
   }
 
-  _renderAdditionalFilmList(listName, sortFunction, count = 2) {
-    const filmListContainer = new MoviesContainer(listName);
-    render(this._moviesContainer, renderPosition.BEFOREEND);
-    render(filmListContainer, renderPosition.BEFOREEND);
-    const sortFilms = sortFunction(this._films);
-    this._renderFilms(0, count, filmListContainer, sortFilms);
+  _renderAdditionalFilmList(container, sortFunction, count = 2) {
+    const sortedFilms = sortFunction(this._films);
+    this._renderFilms(0, count, container, sortedFilms);
   }
 
   _renderFilmList() {
@@ -97,14 +99,17 @@ export default class Page {
       const filmsList = filmsContainer.querySelector('.films-list');
       const filmsListContainer = filmsList.querySelector('.films-list__container');
 
-      render(filmsListContainer, this._movieCard, renderPosition.BEFOREEND);
-
-      this._renderFilms(0, Math.min(this._films.length, MOVIE_CARDS_COUNT), this._moviesContainer.getElement(), this._films);
+      this._renderFilms(0, Math.min(this._films.length, MOVIE_CARDS_COUNT), filmsListContainer, this._films);
       if (this._films.length > MOVIE_CARDS_COUNT) {
         this._renderShowMoreButton();
       }
-      this._renderAdditionalFilmList(TOPRATED_MOVIES, topSortFunction);
-      this._renderAdditionalFilmList(MOST_COMMENTED_FILMS, commentedSortFunction);
+
+      const filmListExtraToprated = filmsContainer.querySelector('.films-list--toprated');
+      const filmTopratedContainer = filmListExtraToprated.querySelector('.films-list__container');
+      const filmListExtraMostCommented = filmsContainer.querySelector('.films-list--most-commented');
+      const filmMostCommentedContainer = filmListExtraMostCommented.querySelector('.films-list__container');
+      this._renderAdditionalFilmList(filmTopratedContainer, topSortFunction, TOPRATED_MOVIES_COUNT);
+      this._renderAdditionalFilmList(filmMostCommentedContainer, commentedSortFunction, MOST_COMMENTED_FILMS);
     }
   }
 

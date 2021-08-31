@@ -111,7 +111,7 @@ export const FILM_PRODUCTION_COUNTRY = [
 ];
 
 export const MOVIE_CARDS_COUNT = 5;
-export const TOPRATED_MOVIES = 2;
+export const TOPRATED_MOVIES_COUNT = 2;
 export const MOST_COMMENTED_FILMS = 2;
 
 

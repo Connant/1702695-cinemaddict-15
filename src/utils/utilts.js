@@ -52,6 +52,15 @@ export const renderPosition = {
 };
 
 export const render = (container, element, place = renderPosition.BEFOREEND) => {
+
+  //  todo https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/instanceof
+
+  if (container instanceof Abstract) {
+    container = container.getElement();
+  }
+  if (element instanceof Abstract) {
+    element = element.getElement();
+  }
   switch (place) {
     case renderPosition.AFTERBEGIN:
       container.prepend(element);
@@ -101,5 +110,5 @@ export const updateItem = (items, update) => {
   ];
 };
 
-export const topSortFunction = (films) => [...films].sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
+export const topSortFunction = (films) => [...films].sort((a, b) => b.movieInfo.rating - a.movieInfo.rating);
 export const commentedSortFunction = (films) => [...films].sort((a, b) => b.comments.length - a.comments.length);
