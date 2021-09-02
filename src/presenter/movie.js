@@ -52,7 +52,7 @@ export default class Movie {
       return;
     }
 
-    if (this._container.getElement().contains((prevFilmComponent.getElement())) && this._mode === Mode.DEFAULT) {
+    if (this._container.contains((prevFilmComponent.getElement())) && this._mode === Mode.DEFAULT) {
       replace(this._filmComponent, prevFilmComponent);
 
     }

@@ -9,6 +9,9 @@ export const EMOJI = [
 
 export const SortType = {
   DEFAULT: 'default',
-  DATE_DOWN: 'date-down',
-  DATE_UP: 'date-up',
+  DATE: 'date',
+  RATING: 'rating',
 };
+
+export const COUNT = 15;
+

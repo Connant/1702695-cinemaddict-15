@@ -112,3 +112,6 @@ export const updateItem = (items, update) => {
 
 export const topSortFunction = (films) => [...films].sort((a, b) => b.movieInfo.rating - a.movieInfo.rating);
 export const commentedSortFunction = (films) => [...films].sort((a, b) => b.comments.length - a.comments.length);
+export const sortDate = (movieFirst, movieSecond) => dayjs(movieSecond.movieInfo.release.date).diff(dayjs(movieFirst.movieInfo.release.date));
+export const sortRating = (movieFirst, movieSecond) => movieSecond.movieInfo.rating - movieFirst.movieInfo.rating;
+

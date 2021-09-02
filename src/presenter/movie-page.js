@@ -5,10 +5,15 @@ import NoMovies from '../view/no-movies.js';
 import Button from '../view/show-more-button.js';
 import Sorting from '../view/sort.js';
 
-import { render, renderPosition, updateItem, topSortFunction, commentedSortFunction, remove } from '../utils/utilts.js';
+import {
+  render, renderPosition, updateItem, remove, replace,
+  topSortFunction, commentedSortFunction, sortRating, sortDate
+} from '../utils/utilts.js';
 import { MOVIE_CARDS_COUNT, TOPRATED_MOVIES_COUNT, MOST_COMMENTED_FILMS } from '../mock/fake-card.js';
 
 import Movie from './movie.js';
+
+import { SortType } from '../constants.js';
 
 
 export default class Page {
@@ -19,16 +24,22 @@ export default class Page {
     this._movieCard = new Card();
     this._showMoreButton = new Button();
     this._noMovies = new NoMovies();
-    this._sortFilms = new Sorting();
     this._filmPresenter = new Map();
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+
+    this._currentSortType = SortType.DEFAULT;
+    this._sortFilms = new Sorting(this._currentSortType);
+    this._topFilmPresenter = new Map();
+    this._commentedFilmPresenter = new Map();
   }
 
   init(films) {
     this._films = films.slice();
+    this._sourcedFilms = films.slice();
     this._renderMenu();
     this._renderSortFilms();
     render(this._mainElement, this._moviesContainer.getElement(), renderPosition.BEFOREEND);
@@ -41,13 +52,71 @@ export default class Page {
     render(this._mainElement, menuComponent, renderPosition.BEFOREEND);
   }
 
+  _rerenderSortFilms(sortType) {
+    const newSorting = new Sorting(sortType);
+    newSorting.setSortTypeChangeHandler(this._handleSortTypeChange);
+    replace(newSorting.getElement(), this._sortFilms);
+    this._sortFilms = newSorting;
+  }
+
   _renderSortFilms() {
     render(this._mainElement, this._sortFilms, renderPosition.BEFOREEND);
+    this._sortFilms.setSortTypeChangeHandler(this._handleSortTypeChange);
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._rerenderSortFilms(sortType);
+    this._sortFilmsList(sortType);
+    this._clearFilmList();
+    this._renderFilmList();
+  }
+
+  _sortFilmsList(sortType) {
+
+    switch (sortType) {
+      case SortType.DATE:
+        this._films.sort(sortDate);
+        break;
+      case SortType.RATING:
+        this._films.sort(sortRating);
+        break;
+      default:
+        this._films = this._sourcedFilms.slice();
+    }
+
+    this._currentSortType = sortType;
+  }
+
+  _renderTopFilm(filmListElement, film) {
+    const topFilmPresenter = new Card(filmListElement, this._handleFilmChange, this._handleModeChange);
+    topFilmPresenter.init(film);
+    this._topFilmPresenter.set(film.id, topFilmPresenter);
+  }
+
+  _renderCommentedFilm(filmListElement, film) {
+    const commentedFilmPresenter = new Card(filmListElement, this._handleFilmChange, this._handleModeChange);
+    commentedFilmPresenter.init(film);
+    this._commentedFilmPresenter.set(film.id, commentedFilmPresenter);
   }
 
   _handleFilmChange(updatedTask) {
     this._films = updateItem(this._films, updatedTask);
     this._filmPresenter.get(updatedTask.id).init(updatedTask);
+
+    this._sourcedFilms = updateItem(this._sourcedFilms, updatedTask);
+    if (this._filmPresenter.get(updatedTask.id)) {
+      this._filmPresenter.get(updatedTask.id).init(updatedTask);
+    }
+    if (this._topFilmPresenter.get(updatedTask.id)) {
+      this._topFilmPresenter.get(updatedTask.id).init(updatedTask);
+    }
+    if (this._commentedFilmPresenter.get(updatedTask.id)) {
+      this._commentedFilmPresenter.get(updatedTask.id).init(updatedTask);
+    }
   }
 
   _renderFilm(filmListElement, film) {
