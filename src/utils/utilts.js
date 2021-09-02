@@ -53,8 +53,6 @@ export const renderPosition = {
 
 export const render = (container, element, place = renderPosition.BEFOREEND) => {
 
-  //  todo https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/instanceof
-
   if (container instanceof Abstract) {
     container = container.getElement();
   }
