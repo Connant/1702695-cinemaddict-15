@@ -53,8 +53,6 @@ export const renderPosition = {
 
 export const render = (container, element, place = renderPosition.BEFOREEND) => {
 
-  //  todo https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/instanceof
-
   if (container instanceof Abstract) {
     container = container.getElement();
   }
@@ -112,3 +110,6 @@ export const updateItem = (items, update) => {
 
 export const topSortFunction = (films) => [...films].sort((a, b) => b.movieInfo.rating - a.movieInfo.rating);
 export const commentedSortFunction = (films) => [...films].sort((a, b) => b.comments.length - a.comments.length);
+export const sortDate = (movieFirst, movieSecond) => dayjs(movieSecond.movieInfo.release.date).diff(dayjs(movieFirst.movieInfo.release.date));
+export const sortRating = (movieFirst, movieSecond) => movieSecond.movieInfo.rating - movieFirst.movieInfo.rating;
+
