@@ -21,7 +21,6 @@ export default class Page {
     this._mainElement = mainElement;
     this._renderCount = MOVIE_CARDS_COUNT;
     this._moviesContainer = new MoviesContainer();
-    // this._movieCard = new Card();
     this._showMoreButton = null;
     this._noMovies = new NoMovies();
 
@@ -157,13 +156,6 @@ export default class Page {
     this._showMoreButton.setClickHandler(this._handleLoadMoreButtonClick);
 
     render(this._moviesContainer, this._showMoreButton, renderPosition.BEFOREEND);
-
-
-    // const filmsContainer = this._mainElement.querySelector('.films');
-    // const filmsList = filmsContainer.querySelector('.films-list');
-    // const el = this._showMoreButton;
-    // render(filmsList.getElement(), el, renderPosition.BEFOREEND);
-    // this._showMoreButton.setClickHandler(this._handleShowMoreButtonClick);
   }
 
   _renderAdditionalFilmList(container, sortFunction, count = 2, presenter) {
