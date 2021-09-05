@@ -34,7 +34,7 @@ export default class Movie {
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new Card(film);
-    this._popupComponent = new Popup(film);
+    this._popupComponent = new Popup(film, this._changeData);
 
 
     this._filmComponent.setClickHandler(this._clickHandler);
