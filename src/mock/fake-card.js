@@ -135,12 +135,12 @@ export const generateComment = () => ({
 });
 
 
-export const generateMovieCard = () => {
+export const generateMovieCard = (id) => {
 
   const comments = new Array(getRandomInt(1, 5)).fill().map(generateComment);
 
   return {
-    id: '0',
+    id: id,
     comments,
     movieInfo: {
       title: getRandomItem(MOVIE_TITLES),

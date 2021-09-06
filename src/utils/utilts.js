@@ -25,7 +25,6 @@ export const getRandomDescription = (items) => {
 };
 
 export const formatReleaseDate = (releaseDate) => dayjs(releaseDate).format('DD MM YYYY');
-
 export const formatRuntime = (runtime) => `${Math.floor(runtime / 60)}h ${runtime % 60}m`;
 
 export const generateDate = () => {
@@ -73,7 +72,8 @@ export const remove = (component) => {
   if (!(component instanceof Abstract)) {
     throw new Error('Can remove only components');
   }
-  component.getElement().remove();
+  const el = component.getElement();
+  el.remove();
   component.removeElement();
 };
 
