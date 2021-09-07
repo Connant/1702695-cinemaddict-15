@@ -19,9 +19,10 @@ import { SortType } from '../constants.js';
 export default class Page {
   constructor(mainElement) {
     this._mainElement = mainElement;
+
     this._renderCount = MOVIE_CARDS_COUNT;
     this._moviesContainer = new MoviesContainer();
-    this._showMoreButton = null;
+    this._showMoreButton = new Button();
     this._noMovies = new NoMovies();
 
     this._filmPresenter = new Map();
@@ -75,7 +76,6 @@ export default class Page {
   }
 
   _sortFilmsList(sortType) {
-
     switch (sortType) {
       case SortType.DATE:
         this._films.sort(sortDate);
@@ -134,8 +134,12 @@ export default class Page {
   }
 
   _handleShowMoreButtonClick() {
-    this._renderFilms(this._renderedCount, this._renderedCount + MOVIE_CARDS_COUNT, this._filmListContainer, this._films, this._renderFilm);
-    this._renderCount += MOVIE_CARDS_COUNT;
+    const filmsCount = this._renderFilmList().length;
+    const newRenderedCount = Math.min(filmsCount, this._renderCount + 5);
+    this._renderFilms(this._moviesContainer, this._renderFilm, this._comments);
+    this._renderCount = newRenderedCount;
+
+    this._renderFilms(this._renderCount + MOVIE_CARDS_COUNT, this._moviesContainer, this._films, this._renderFilm);
 
     if (this._renderCount >= this._films.length) {
       remove(this._showMoreButton);
@@ -148,14 +152,12 @@ export default class Page {
 
   _renderShowMoreButton() {
 
-    if (this._showMoreButton !== null) {
-      this._showMoreButton = null;
-    }
+    const filmsContainer = this._mainElement.querySelector('.films');
+    const filmsList = filmsContainer.querySelector('.films-list');
+    render(filmsList, this._showMoreButton, renderPosition.BEFOREEND);
 
-    this._showMoreButton = new Button();
-    this._showMoreButton.setClickHandler(this._handleLoadMoreButtonClick);
+    this._showMoreButton.setClickHandler(this._handleShowMoreButtonClick);
 
-    render(this._moviesContainer, this._showMoreButton, renderPosition.BEFOREEND);
   }
 
   _renderAdditionalFilmList(container, sortFunction, count = 2, presenter) {
