@@ -3,7 +3,7 @@ import { MAX_LENGTH_DESCRIPTION, EMOJI } from '../constants';
 import {
   getRandomInt,
   getRandomFloat, getRandomItem,
-  getRandomDescription, formatRuntime, generateDate
+  getRandomDescription, generateDate
 } from '../utils/utilts.js';
 
 import dayjs from 'dayjs';
@@ -128,9 +128,9 @@ const getRandomBoolean = () => !!Math.round(Math.random());
 
 export const generateComment = () => ({
   id: '42',
-  author: 'Audrey Hepburn',
-  comment: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-  date: '2019-05-11T16:12:32.554Z',
+  author: getRandomItem(WRITERS),
+  comment: getRandomItem(LOREM_IPSUM_DESCRIPTIONS),
+  date: '7 September 16:00',
   emoji: getRandomItem(EMOJI),
 });
 
@@ -148,7 +148,7 @@ export const generateMovieCard = (id) => {
       poster: getRandomItem(POSTERS),
       year: getRandomItem(YEAR_OF_ISSUE),
       duration: getRandomItem(MOVIE_DURATION),
-      runtime: formatRuntime(100),
+      runtime: getRandomInt(0, 100),
       genre: getRandomItem(MOVIE_GENRES),
       rating: getRandomFloat(1, 10),
       director: getRandomItem(DIRECTORS),

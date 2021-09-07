@@ -1,5 +1,6 @@
-import { formatReleaseDate, formatRuntime } from '../utils/utilts.js';
+import { formatRuntime, generateRuntime, getDayMonthFormat, getYearsFormat } from '../utils/utilts.js';
 import SmartView from './smart.js';
+import dayjs from 'dayjs';
 
 const createCommentTemplate = (comment) => (
   ` <li class="film-details__comment">
@@ -99,11 +100,11 @@ const createPopupTemplate = (data, newComment) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${formatReleaseDate}</td>
+              <td class="film-details__cell">${getDayMonthFormat(movieInfo.release.date)} ${getYearsFormat((movieInfo.release.date))}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${formatRuntime}</td>
+              <td class="film-details__cell">${generateRuntime(movieInfo.runtime)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
@@ -136,8 +137,10 @@ const createPopupTemplate = (data, newComment) => {
 };
 
 export default class Popup extends SmartView {
-  constructor(film, changeData) {
+  constructor(film, changeData, comments) {
     super();
+    this._comments = comments;
+    this._newComment = {};
     this._data = Popup.parseFilmToData(film);
     this._changeData = changeData;
     this._clickHandler = this._clickHandler.bind(this);
@@ -152,7 +155,7 @@ export default class Popup extends SmartView {
   }
 
   getTemplate() {
-    return createPopupTemplate(this._data, this._newComment);
+    return createPopupTemplate(this._data, this._newComment, this._comments);
   }
 
   _clickHandler(evt) {
@@ -245,7 +248,7 @@ export default class Popup extends SmartView {
         {},
         this._newComment,
         {
-          text: evt.target.value,
+          comment: evt.target.value,
         },
       ), true);
     this.getElement().scrollTop = this._data.scrollPosition;
@@ -275,11 +278,11 @@ export default class Popup extends SmartView {
   }
 
   _sendCommentHandler(evt) {
-    if (evt.ctrlKey && evt.key === 'Enter') {
+    if (evt.key === 'Enter') {
       evt.preventDefault();
 
-      if (this._newComment.emoji || this._newComment.text) {
-        this._addingNewCooment();
+      if (this._newComment.emoji && this._newComment.comment) {
+        this._addingNewComment();
         this.updateData(
           Object.assign(
             {},
@@ -294,14 +297,16 @@ export default class Popup extends SmartView {
     }
   }
 
-  _addingNewCooment() {
+  _addingNewComment() {
+    const dueDate = dayjs();
+    const el = `${getDayMonthFormat(dueDate)} ${formatRuntime(dueDate)}`;
     this._newComment = Object.assign(
       {},
       this._newComment,
       {
-        id: 1,
-        author: 'Name',
-        dueDate: `${formatReleaseDate} ${formatRuntime}`,
+        id: 3,
+        author: 'Iron Maaaan',
+        date: el,
       });
 
     const comments = this._data.comments;
