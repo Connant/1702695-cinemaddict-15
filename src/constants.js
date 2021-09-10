@@ -15,3 +15,36 @@ export const SortType = {
 
 export const COUNT = 15;
 
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export const Pages = {
+  ALL: 'all',
+  WATCHLIST: 'watchlist',
+  HISTORY: 'history',
+  FAVORITES: 'favorites',
+  STATISTIC: 'stats',
+};
+
+export const NoFilmsTextType = {
+  [Pages.All]: 'There are no movies in our database',
+  [Pages.WATCHLIST]: 'There are no movies to watch now',
+  [Pages.HISTORY]: 'There are no watched movies now',
+  [Pages.FAVORITES]: 'There are no favorite movies now',
+};
+
+export const UserAction = {
+  UPDATE_FILM: 'UPDATE_FILM',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};
+
+export const Mode = {
+  DEFAULT: 'DEFAULT',
+  POPUP: 'POPUP',
+};
+

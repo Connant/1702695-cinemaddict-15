@@ -4,6 +4,7 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
+import { Pages } from '../constants.js';
 
 export const getRandomInt = (firstNumber = 0, secondNumber = 1) => {
   const larger = Math.ceil(Math.min(firstNumber, secondNumber));
@@ -128,3 +129,10 @@ export const commentedSortFunction = (films) => [...films].sort((a, b) => b.comm
 export const sortDate = (movieFirst, movieSecond) => dayjs(movieSecond.movieInfo.release.date).diff(dayjs(movieFirst.movieInfo.release.date));
 export const sortRating = (movieFirst, movieSecond) => movieSecond.movieInfo.rating - movieFirst.movieInfo.rating;
 
+
+export const filter = {
+  [Pages.ALL]: (films) => films,
+  [Pages.WATCHLIST]: (films) => films.filter((film) => film.userDetails.watchlist),
+  [Pages.HISTORY]: (films) => films.filter((film) => film.userDetails.alreadyWatched),
+  [Pages.FAVORITES]: (films) => films.filter((film) => film.userDetails.favorite),
+};

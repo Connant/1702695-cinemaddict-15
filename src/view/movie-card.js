@@ -1,4 +1,4 @@
-import { formatRuntime } from '../utils/utilts.js';
+import { formatRuntime } from '../utils/utils.js';
 import Abstract from './abstract.js';
 
 export const createMovieCardTemplate = (card) => {

@@ -4,9 +4,10 @@ import {
   getRandomInt,
   getRandomFloat, getRandomItem,
   getRandomDescription, generateDate
-} from '../utils/utilts.js';
+} from '../utils/utils.js';
 
 import dayjs from 'dayjs';
+import { nanoid } from 'nanoid';
 
 export const POSTERS = [
   'images/posters/the-dance-of-life.jpg',
@@ -127,7 +128,7 @@ const createDescription = () => {
 const getRandomBoolean = () => !!Math.round(Math.random());
 
 export const generateComment = () => ({
-  id: '42',
+  id: nanoid(),
   author: getRandomItem(WRITERS),
   comment: getRandomItem(LOREM_IPSUM_DESCRIPTIONS),
   date: '7 September 16:00',
