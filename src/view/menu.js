@@ -1,39 +1,51 @@
 import Abstract from './abstract.js';
 
-export const menuTemplate = (movies) => {
-  let watchlist = 0;
-  let history = 0;
-  let favorites = 0;
-  movies.forEach((film) => {
-    watchlist = film.userDetails.watchlist ? watchlist += 1 : watchlist;
-    history = film.userDetails.alreadyWatched ? history += 1 : history;
-    favorites = film.userDetails.favorite ? favorites += 1 : favorites;
-  });
+const menuTemplate = (filters, filterData) => {
+  const allFilter = filters[0];
+  const watchlistFilter = filters[1];
+  const historyFilter = filters[2];
+  const favoritesFilter = filters[3];
 
   return `<nav class="main-navigation">
-  <div class="main-navigation__items">
-    <a href="#all" class="main-navigation__item main-navigation__item--active">All movies</a>
-    <a href="#watchlist" class="main-navigation__item">Watchlist <span class="main-navigation__item-count">${watchlist}</span></a>
-    <a href="#history" class="main-navigation__item">History <span class="main-navigation__item-count">${history}</span></a>
-    <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">${favorites}</span></a>
-  </div>
-  <a href="#stats" class="main-navigation__additional">Stats</a>
-</nav>
+    <div class="main-navigation__items">
 
-<ul class="sort">
-  <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
-  <li><a href="#" class="sort__button">Sort by date</a></li>
-  <li><a href="#" class="sort__button">Sort by rating</a></li>
-</ul>`;
+    <a href="#all" type= ${allFilter.type} class="main-navigation__item
+    ${allFilter.type === filterData ? 'main-navigation__item--active' : ''}">All movies</a>
+
+    <a href="#watchlist" type=${watchlistFilter.type} class="main-navigation__item
+    ${watchlistFilter.type === filterData ? 'main-navigation__item--active' : ''}">Watchlist <span class="main-navigation__item-count">${watchlistFilter.count}</span></a>
+
+    <a href="#history" type= ${historyFilter.type} class="main-navigation__item
+    ${historyFilter.type === filterData ? 'main-navigation__item--active' : ''}">History <span class="main-navigation__item-count">${historyFilter.count}</span></a>
+
+    <a href="#favorites" type = ${favoritesFilter.type} class="main-navigation__item
+    ${favoritesFilter.type === filterData ? 'main-navigation__item--active' : ''}">Favorites <span class="main-navigation__item-count">${favoritesFilter.count}</span></a>
+
+    </nav>`;
 };
 
 export default class Menu extends Abstract {
-  constructor(films) {
+  constructor(filters, filterData) {
     super();
-    this._filters = films;
+    this._filters = filters;
+    this._currentFilter = filterData;
+    this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return menuTemplate(this._filters);
+    return menuTemplate(this._filters, this._currentFilter);
+  }
+
+  _filterTypeChangeHandler(evt) {
+    if (evt.target.tagName !== 'A') {
+      return;
+    }
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.type);
+  }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.getElement().addEventListener('click', this._filterTypeChangeHandler);
   }
 }
