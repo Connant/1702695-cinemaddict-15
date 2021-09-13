@@ -24,7 +24,7 @@ export default class CommentsModel extends AbstractObserver {
   }
 
   deleteComment(updateType, update, comments, scroll) {
-    const index = this._comments.findIndex((comment) => comment.id === comments.id);
+    const index = this._comments.findIndex((comment) => comment.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
@@ -37,4 +37,5 @@ export default class CommentsModel extends AbstractObserver {
 
     this._notify(updateType, update, this._comments, scroll);
   }
+
 }

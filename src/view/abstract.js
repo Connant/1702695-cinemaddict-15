@@ -22,6 +22,26 @@ export default class Abstract {
     return this._element;
   }
 
+  show() {
+    if (this._element) {
+      this._element.classList.remove('visually-hidden');
+    }
+  }
+
+  hide() {
+    if (this._element) {
+      this._element.classList.add('visually-hidden');
+    }
+  }
+
+  renderElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
   removeElement() {
     this._element = null;
   }

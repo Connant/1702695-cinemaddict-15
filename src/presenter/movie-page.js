@@ -8,7 +8,7 @@ import {
 import {
   SortType, UserAction, UpdateType, Pages
 } from '../constants.js';
-
+import { headerElement } from '../main.js';
 
 import MoviesContainer from '../view/films-container';
 import NoMovies from '../view/no-movies.js';
@@ -20,6 +20,7 @@ import Movie from './movie.js';
 export default class Page {
   constructor(mainElement, filmsModel, commentsModel) {
     this._mainElement = mainElement;
+    this._headerElement = headerElement;
 
     this._renderCount = MOVIE_CARDS_COUNT;
     this._moviesContainer = new MoviesContainer();
@@ -32,10 +33,8 @@ export default class Page {
 
     this._filmsModel = filmsModel;
     this._commentsModel = commentsModel;
-    // this._filterModel = filterModel;
     this._filterType = Pages.ALL;
 
-    // this._comments = null;
     this._scrollPosition = null;
     this._menuComponent = null;
     this._noFilmsComponent = null;
@@ -46,7 +45,7 @@ export default class Page {
     this._commentedFilmPresenter = new Map();
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
-    // this._handleFilmChange = this._handleFilmChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
@@ -100,10 +99,10 @@ export default class Page {
       case UserAction.UPDATE_FILM:
         this._filmsModel.updateFilm(updateType, update, comments, scrollPosition);
         break;
-      case UserAction.ADD_COMMENTS:
+      case UserAction.ADD_COMMENT:
         this._commentsModel.addComment(updateType, update, comments, scrollPosition);
         break;
-      case UserAction.DELETE_COMMENTS:
+      case UserAction.DELETE_COMMENT:
         this._commentsModel.deleteComment(updateType, update, comments, scrollPosition);
         break;
     }
@@ -245,5 +244,21 @@ export default class Page {
     if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;
     }
+  }
+
+  hide() {
+    this._moviesContainer.hide();
+    this._filmPresenter.forEach((item) => item._filmComponent.hide());
+    this._showMoreButton.hide();
+    this._topFilmPresenter.forEach((item) => item._filmComponent.hide());
+    this._commentedFilmPresenter.forEach((item) => item._filmComponent.hide());
+  }
+
+  show() {
+    this._moviesContainer.hide();
+    this._filmPresenter.forEach((item) => item._filmComponent.hide());
+    this._showMoreButton.hide();
+    this._topFilmPresenter.forEach((item) => item._filmComponent.hide());
+    this._commentedFilmPresenter.forEach((item) => item._filmComponent.hide());
   }
 }

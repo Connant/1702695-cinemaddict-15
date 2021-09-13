@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 import Abstract from '../view/abstract.js';
+import { Pages } from '../constants.js';
+
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
-import { Pages } from '../constants.js';
+
 
 export const getRandomInt = (firstNumber = 0, secondNumber = 1) => {
   const larger = Math.ceil(Math.min(firstNumber, secondNumber));
@@ -136,3 +138,33 @@ export const filter = {
   [Pages.HISTORY]: (films) => films.filter((film) => film.userDetails.alreadyWatched),
   [Pages.FAVORITES]: (films) => films.filter((film) => film.userDetails.favorite),
 };
+
+export const getGenres = (films) => {
+  const genresArray = films.map((film) => film.movieInfo.genre).flat();
+  return [...new Set(genresArray)];
+
+};
+
+
+export const getNumberFilmsGenre = (films) => {
+  const genres = getGenres(films);
+  const result = {};
+  genres.forEach((genre) => {
+    result[genre] = 0;
+    films.forEach((film) => {
+      if (genre === film.movieInfo.genre) {
+        result[genre] += 1;
+      }
+    });
+  });
+  return result;
+};
+
+export const getSortGenresFilms = (obj) => {
+  const newObj = {};
+  Object.keys(obj).sort((a, b) => obj[b] - obj[a]).forEach((i) => newObj[i] = obj[i]);
+  return newObj;
+};
+
+export const completedFimsInDateRange = (films, dateFrom, dateTo, format) => films.filter((film) =>
+  dayjs(film.userDetails.watchingDate).isBetween(dateFrom, dateTo, format, '[]'));

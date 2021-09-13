@@ -167,8 +167,8 @@ export const generateMovieCard = (id) => {
     userDetails: {
       watchlist: getRandomBoolean(getRandomInt(0, 1)),
       alreadyWatched: getRandomBoolean(getRandomInt(0, 1)),
-      watchingDate: dayjs(generateDate()).format('D MMMM YYYY HH:MM'),
       favorite: getRandomBoolean(getRandomInt(0, 1)),
+      watchingDate: dayjs(generateDate()).format('D MMMM YYYY HH:MM'),
     },
   };
 };

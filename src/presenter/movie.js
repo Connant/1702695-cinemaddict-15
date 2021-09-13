@@ -26,9 +26,8 @@ export default class Movie {
 
   init(film, comments, scrollPosition) {
     this._film = film;
-    this._comments = comments;
+    this._comments = film.comments;
     this._scrollPosition = scrollPosition;
-    this._comments = this._getCommentsFilm(this._film);
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
@@ -59,8 +58,6 @@ export default class Movie {
     if (this._bodyElement.contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
-
-      this._bodyElement.classList.add('hide-overflow');
       this._bodyElement.scroll(0,this._scrollPosition);
     }
 
@@ -151,13 +148,10 @@ export default class Movie {
   }
 
   _openPopupFilm() {
-    if (document.querySelector('.film-details')) {
-      document.querySelector('.film-details').remove();
-    }
     this._bodyElement.classList.add('hide-overflow');
     render(this._bodyElement, this._popupComponent, renderPosition.BEFOREEND);
-    this._mode = Mode.POPUP;
     this._changeMode();
+    this._mode = Mode.POPUP;
   }
 
   _onClosePopup() {

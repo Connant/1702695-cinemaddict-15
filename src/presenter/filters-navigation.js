@@ -3,10 +3,11 @@ import { render, renderPosition, replace, remove, filter } from '../utils/utils.
 import { Pages, UpdateType } from '../constants.js';
 
 export default class FilterNav {
-  constructor(filterContainer, pageModel, filmsModel) {
+  constructor(filterContainer, pageModel, filmsModel, handleStatistic) {
     this._filterContainer = filterContainer;
     this._pageModel = pageModel;
     this._filmsModel = filmsModel;
+    this._handleStatistic = handleStatistic;
 
     this._filterComponent = null;
 
@@ -37,10 +38,13 @@ export default class FilterNav {
   }
 
   _handleFilterTypeChange(filterType) {
-    if (this._pageModel.getActivePage() === filterType) {
+    if (filterType === Pages.STATISTIC) {
+      this._pageModel.setActivePage(null, filterType);
+      this._handleStatistic(filterType);
       return;
     }
-    this._pageModel.setActivePage(UpdateType.MAJOR, filterType);
+    this._pageModel.setFilter(UpdateType.MAJOR, filterType);
+    this._handleStatistic(filterType);
   }
 
   _getFilters() {
