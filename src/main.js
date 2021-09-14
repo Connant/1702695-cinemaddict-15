@@ -23,7 +23,7 @@ commentsModel.setComments(idComments);
 filmsModel.setFilms(films);
 
 const pageModel = new PageModel();
-const pagePresenter = new Page(mainElement, filmsModel, commentsModel);
+const pagePresenter = new Page(mainElement, filmsModel, commentsModel, pageModel);
 
 const filterPresenter = new FilterNav(mainElement, pageModel, filmsModel, handleMenuClick);
 render(headerElement, new UserRunk().getElement(), renderPosition.BEFOREEND);

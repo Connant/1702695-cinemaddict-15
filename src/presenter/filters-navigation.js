@@ -43,7 +43,7 @@ export default class FilterNav {
       this._handleStatistic(filterType);
       return;
     }
-    this._pageModel.setFilter(UpdateType.MAJOR, filterType);
+    this._pageModel.setActivePage(UpdateType.MAJOR, filterType);
     this._handleStatistic(filterType);
   }
 

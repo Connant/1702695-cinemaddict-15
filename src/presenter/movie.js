@@ -3,19 +3,17 @@ import Card from '../view/movie-card';
 import Popup from '../view/popup.js';
 import { Mode, UserAction, UpdateType, Pages } from '../constants.js';
 
+
 export default class Movie {
   constructor(container, changeData, changeMode, filterType) {
     this._container = container;
     this._changeData = changeData;
     this._changeMode = changeMode;
-
     this._bodyElement = document.querySelector('body');
-
     this._filmComponent = null;
     this._popupComponent = null;
     this._mode = Mode.DEFAULT;
     this._filterType = filterType;
-
     this._clickHandler = this._clickHandler.bind(this);
     this._clickClose = this._clickClose.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
@@ -24,23 +22,21 @@ export default class Movie {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
-  init(film, comments, scrollPosition) {
+  init(film, scrollPosition) {
     this._film = film;
     this._comments = film.comments;
     this._scrollPosition = scrollPosition;
+    this._comments = this._getCommentsFilm(this._film);
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new Card(this._film);
     this._popupComponent = new Popup(this._film, this._changeData, this._comments, this._scrollPosition, this._saveScroll);
-
-
     this._filmComponent.setClickHandler(this._clickHandler);
     this._filmComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmComponent.setAlreadyWatchedClickHandler(this._handleHistoryClick);
     this._filmComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-
     this._popupComponent.setClickHandler(this._clickClose);
     this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._popupComponent.setAlreadyWatchedClickHandler(this._handleHistoryClick);
@@ -53,17 +49,15 @@ export default class Movie {
 
     if (this._container.contains((prevFilmComponent.getElement())) && this._mode === Mode.DEFAULT) {
       replace(this._filmComponent, prevFilmComponent);
-
     }
+
     if (this._bodyElement.contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
-      this._bodyElement.scroll(0,this._scrollPosition);
+
+      this._bodyElement.classList.add('hide-overflow');
+      this._bodyElement.scroll(0, this._scrollPosition);
     }
-
-    remove(prevFilmComponent);
-    remove(prevPopupComponent);
-
   }
 
   destroy() {
@@ -148,10 +142,14 @@ export default class Movie {
   }
 
   _openPopupFilm() {
+    if (document.querySelector('.film-details')) {
+      document.querySelector('.film-details').remove();
+    }
     this._bodyElement.classList.add('hide-overflow');
     render(this._bodyElement, this._popupComponent, renderPosition.BEFOREEND);
     this._changeMode();
     this._mode = Mode.POPUP;
+
   }
 
   _onClosePopup() {
@@ -172,7 +170,7 @@ export default class Movie {
     this._popupComponent.setClickHandler(this._clickClose);
     this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    this._popupComponent.setAlreadyWatchedClickHandler(this. _handleHistoryClick);
+    this._popupComponent.setAlreadyWatchedClickHandler(this._handleHistoryClick);
   }
 
   _saveScroll(scrollPosition) {

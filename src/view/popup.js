@@ -340,14 +340,20 @@ export default class Popup extends SmartView {
       },
     );
     this._newComment = {};
-    this._changeData(this._data);
+    this._changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, newcomment);
   }
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();
     const updatedComments = this._delete(this._data.comments, evt.target.id);
     const index = this._data.comments.findIndex((comment) => comment.id === evt.target.id);
-    this._changeData(UserAction.DELETE_COMMENT, UpdateType.PATCH, this._data.comments[index], this._data, this._scrollPosition);
+    this._changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      this._data.comments[index],
+      this._data,
+      this._scrollPosition,
+    );
     this._changeData(
       UserAction.UPDATE_FILM,
       UpdateType.PATCH, Object.assign(
