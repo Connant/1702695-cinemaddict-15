@@ -156,6 +156,7 @@ export default class Popup extends SmartView {
 
     this._scrollPosition = scroll;
     this._saveScroll = saveScroll;
+
     this._deleteCommentHandlers = this._deleteCommentHandlers.bind(this);
     this._scrollHandler = this._scrollHandler.bind(this);
 
@@ -169,6 +170,12 @@ export default class Popup extends SmartView {
   _clickHandler(evt) {
     evt.preventDefault();
     this._newComment = {};
+    this._addingNewComment(
+      Object.assign(
+        {},
+        this._newComment,
+        this._newComment,
+      ));
     this._callback.click();
   }
 
@@ -312,14 +319,13 @@ export default class Popup extends SmartView {
 
   _addingNewComment() {
     const dueDate = dayjs();
-    const el = `${getDayMonthFormat(dueDate)} ${formatRuntime(dueDate)}`;
     this._newComment = Object.assign(
       {},
       this._newComment,
       {
         id: nanoid(),
         author: 'Iron Maaaan',
-        date: el,
+        date: `${getDayMonthFormat(dueDate)} ${formatRuntime(dueDate)}`,
       });
 
     const comments = this._data.comments;
@@ -334,39 +340,45 @@ export default class Popup extends SmartView {
       },
     );
     this._newComment = {};
-    this._changeData(this._data);
+    this._changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, newcomment);
   }
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();
-    const comments = this._delete(this._data.comments, evt.target.id);
-    this._data = Popup.parseDataToFilm(this._data);
-    const index = this._comments.findIndex((comment) => comment.id === evt.target.id);
-    this._changeData(UserAction.DELETE_COMMENTS, UpdateType.PATCH, this._data, this._comments[index], this._scrollPosition);
+    const updatedComments = this._delete(this._data.comments, evt.target.id);
+    const index = this._data.comments.findIndex((comment) => comment.id === evt.target.id);
+    this._changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      this._data.comments[index],
+      this._data,
+      this._scrollPosition,
+    );
     this._changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
-      Object.assign(
+      UpdateType.PATCH, Object.assign(
         {},
         this._data,
         {
-          comments: comments,
+          comments: updatedComments,
         },
-      ), this._comments, this._scrollPosition);
+      ), this._data.comments, this._scrollPosition);
 
   }
 
   _delete(comments, update) {
-    const index = comments.findIndex((comment) => comment === update);
-    return [
+    const index = comments.findIndex((comment) => comment.id === update);
+    const el = [
       ...comments.slice(0, index),
       ...comments.slice(index + 1),
     ];
+    return el;
   }
+
 
   _scrollHandler(evt) {
     evt.preventDefault();
-    this._scrollPosition= evt.target.offsetHeight;
+    this._scrollPosition = evt.target.offsetHeight;
   }
 
   restoreHandlers() {

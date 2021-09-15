@@ -27,7 +27,7 @@ export const Pages = {
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
-  STATISTIC: 'stats',
+  STATISTIC: 'statistics',
 };
 
 export const NoFilmsTextType = {
@@ -46,5 +46,13 @@ export const UserAction = {
 export const Mode = {
   DEFAULT: 'DEFAULT',
   POPUP: 'POPUP',
+};
+
+export const CurrentType = {
+  All: 'all',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
 };
 

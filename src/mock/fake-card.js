@@ -139,6 +139,7 @@ export const generateComment = () => ({
 export const generateMovieCard = (id) => {
 
   const comments = new Array(getRandomInt(1, 5)).fill().map(generateComment);
+  const commonDate = dayjs(generateDate(YEAR_OF_ISSUE));
 
   return {
     id: id,
@@ -147,7 +148,7 @@ export const generateMovieCard = (id) => {
       title: getRandomItem(MOVIE_TITLES),
       alternativeTitle: 'Movie title',
       poster: getRandomItem(POSTERS),
-      year: getRandomItem(YEAR_OF_ISSUE),
+      year: commonDate.format('YYYY'),
       duration: getRandomItem(MOVIE_DURATION),
       runtime: getRandomInt(0, 100),
       genre: getRandomItem(MOVIE_GENRES),
@@ -156,7 +157,7 @@ export const generateMovieCard = (id) => {
       writers: getRandomItem(WRITERS),
       actors: getRandomItem(ACTORS),
       release: {
-        date: dayjs(generateDate(YEAR_OF_ISSUE)).format('D MMMM YYYY HH:MM'),
+        date: commonDate.format('D MMMM YYYY HH:MM'),
         releaseCountry: getRandomItem(FILM_PRODUCTION_COUNTRY),
       },
       ageRating: getRandomInt(0, 18),
@@ -167,8 +168,8 @@ export const generateMovieCard = (id) => {
     userDetails: {
       watchlist: getRandomBoolean(getRandomInt(0, 1)),
       alreadyWatched: getRandomBoolean(getRandomInt(0, 1)),
-      watchingDate: dayjs(generateDate()).format('D MMMM YYYY HH:MM'),
       favorite: getRandomBoolean(getRandomInt(0, 1)),
+      watchingDate: dayjs(generateDate()).format('D MMMM YYYY HH:MM'),
     },
   };
 };

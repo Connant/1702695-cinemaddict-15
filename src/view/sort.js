@@ -25,7 +25,7 @@ const createSortTemplate = (newSorting) => {
   </ul>`;
 };
 
-export default class SiteSort extends Abstract {
+export default class Sorting extends Abstract {
   constructor(newSorting) {
     super();
     this._newSorting = newSorting;

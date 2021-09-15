@@ -1,4 +1,5 @@
 import Abstract from './abstract.js';
+import { Pages } from '../constants.js';
 
 const menuTemplate = (filters, filterData) => {
   const allFilter = filters[0];
@@ -20,6 +21,11 @@ const menuTemplate = (filters, filterData) => {
 
     <a href="#favorites" type = ${favoritesFilter.type} class="main-navigation__item
     ${favoritesFilter.type === filterData ? 'main-navigation__item--active' : ''}">Favorites <span class="main-navigation__item-count">${favoritesFilter.count}</span></a>
+
+    </div>
+
+    <a href="#stats" type = ${Pages.STATISTIC} class="main-navigation__additional
+    ${filterData === Pages.STATISTIC ? 'main-navigation__item--active' : ''}">Stats</a>
 
     </nav>`;
 };
