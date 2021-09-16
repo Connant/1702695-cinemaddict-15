@@ -30,7 +30,6 @@ export default class Movie {
   init(film, scrollPosition) {
     this._film = film;
     this._scrollPosition = scrollPosition;
-    this._comments = this._commentsModel.getComments();
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
