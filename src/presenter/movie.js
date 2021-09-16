@@ -5,15 +5,20 @@ import { Mode, UserAction, UpdateType, Pages } from '../constants.js';
 
 
 export default class Movie {
-  constructor(container, changeData, changeMode, filterType) {
+  constructor(container, changeData, changeMode, filterType, api, commentsModel) {
     this._container = container;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._filterType = filterType;
+    this._api = api;
+    this._commentsModel = commentsModel;
+
     this._bodyElement = document.querySelector('body');
     this._filmComponent = null;
     this._popupComponent = null;
     this._mode = Mode.DEFAULT;
-    this._filterType = filterType;
+    this._comments = [];
+
     this._clickHandler = this._clickHandler.bind(this);
     this._clickClose = this._clickClose.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
@@ -24,9 +29,8 @@ export default class Movie {
 
   init(film, scrollPosition) {
     this._film = film;
-    this._comments = film.comments;
     this._scrollPosition = scrollPosition;
-    this._comments = this._getCommentsFilm(this._film);
+    this._comments = this._commentsModel.getComments();
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
@@ -44,6 +48,7 @@ export default class Movie {
 
     if (prevFilmComponent === null || prevPopupComponent === null) {
       render(this._container, this._filmComponent, renderPosition.BEFOREEND);
+      this._getCommentsFilm(film);
       return;
     }
 
@@ -72,8 +77,13 @@ export default class Movie {
   }
 
   _getCommentsFilm(film) {
-    const commentsIds = film.comments;
-    return this._comments.filter((comment) => commentsIds.includes(comment.id));
+    this._api.getComments(film.id)
+      .then((comments) => {
+        this._commentsModel.setComments(UpdateType.PATCH, film, comments);
+      })
+      .catch(() => {
+        this._commentsModel.setComments(UpdateType.PATCH, film, []);
+      });
   }
 
   _handleFavoriteClick() {
@@ -147,6 +157,7 @@ export default class Movie {
     }
     this._bodyElement.classList.add('hide-overflow');
     render(this._bodyElement, this._popupComponent, renderPosition.BEFOREEND);
+    this._getCommentsFilm(this._film);
     this._changeMode();
     this._mode = Mode.POPUP;
 

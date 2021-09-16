@@ -1,4 +1,4 @@
-import { formatRuntime, generateRuntime, getDayMonthFormat, getYearsFormat } from '../utils/utils.js';
+import { generateRuntime, getTimeFormat, getDayMonthFormat, getYearsFormat } from '../utils/utils.js';
 import SmartView from './smart.js';
 import { UserAction, UpdateType } from '../constants.js';
 import dayjs from 'dayjs';
@@ -7,23 +7,23 @@ import he from 'he';
 
 const createCommentTemplate = (comment) => (
   ` <li class="film-details__comment">
-          <span class="film-details__comment-emoji">
-            <img src=${comment.emoji} width="55" height="55" alt="emoji-smile">
-          </span>
-          <div>
-            <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
-            <p class="film-details__comment-info" >
-              <span class="film-details__comment-author">${comment.author}</span>
-              <span class="film-details__comment-day">${comment.date}</span>
-              <button class="film-details__comment-delete" id=${comment.id}>Delete</button>
-            </p>
-          </div>
-        </li>`
+      <span class="film-details__comment-emoji">
+        <img src=${comment.emoji} width="55" height="55" alt="emoji-smile">
+      </span>
+      <div>
+        <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
+        <p class="film-details__comment-info" >
+          <span class="film-details__comment-author">${comment.author}</span>
+          <span class="film-details__comment-day">${comment.date}</span>
+          <button class="film-details__comment-delete" id=${comment.id}>Delete</button>
+        </p>
+      </div>
+    </li>`
 );
 
 const createCommentsTemplate = (comments) => (
   `<ul class="film-details__comments-list" style="font-size:0" >
-  ${comments.map((comment) => createCommentTemplate(comment))}
+    ${comments.map((comment) => createCommentTemplate(comment))}
   </ul>`
 );
 
@@ -131,8 +131,8 @@ const createPopupTemplate = (data, newComment) => {
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
       <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-      ${comments ? createCommentsTemplate(comments) : ''}
-      ${createNewCommentTemplate(newComment)}
+        ${comments ? createCommentsTemplate(data.comments) : ''}
+        ${createNewCommentTemplate(newComment)}
       </section>
     </div>
   </form>
@@ -144,7 +144,7 @@ export default class Popup extends SmartView {
     super();
     this._comments = comments;
     this._newComment = {};
-    this._data = Popup.parseFilmToData(film);
+    this._data = Popup.parseFilmToData(film, comments);
     this._changeData = changeData;
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
@@ -217,11 +217,12 @@ export default class Popup extends SmartView {
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickHandler);
   }
 
-  static parseFilmToData(film) {
+  static parseFilmToData(film, comments) {
     return Object.assign(
       {},
       film,
       {
+        comments: comments,
         scrollPosition: null,
         isComments: film.comments.length !== 0,
       },
@@ -325,7 +326,7 @@ export default class Popup extends SmartView {
       {
         id: nanoid(),
         author: 'Iron Maaaan',
-        date: `${getDayMonthFormat(dueDate)} ${formatRuntime(dueDate)}`,
+        date: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
       });
 
     const comments = this._data.comments;

@@ -1,10 +1,10 @@
-import { formatRuntime } from '../utils/utils.js';
+import { getTimeFormat, getYearsFormat } from '../utils/utils.js';
 import Abstract from './abstract.js';
 
 export const createMovieCardTemplate = (card) => {
   const { movieInfo, userDetails } = card;
 
-  const runtimeMovie = formatRuntime(movieInfo.runtime);
+  const runtimeMovie = getTimeFormat(movieInfo.runtime);
 
   const setCardControlsItemActive = (value) => value ? 'film-card__controls-item--active' : '';
 
@@ -16,9 +16,9 @@ export const createMovieCardTemplate = (card) => {
     <h3 class="film-card__title">${movieInfo.title}</h3>
   <p class="film-card__rating">${movieInfo.rating}</p>
     <p class="film-card__info">
-      <span class="film-card__year">${movieInfo.year}</span>
+      <span class="film-card__year">${getYearsFormat(movieInfo.release.date)}</span>
       <span class="film-card__duration">${runtimeMovie}</span>
-      <span class="film-card__genre">${movieInfo.genre}</span>
+      <span class="film-card__genre">${movieInfo.genre.slice(0, 1)}}</span>
     </p>
     <img src="${movieInfo.poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${movieInfo.description}</p>

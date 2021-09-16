@@ -40,8 +40,7 @@ export const generateDate = () => {
 
 export const getDayMonthFormat = (dueDate) => dayjs(dueDate).format('D MMMM');
 export const getYearsFormat = (dueDate) => dayjs(dueDate).format('YYYY');
-
-export const formatRuntime = (dueDate) => dayjs(dueDate).format('HH:MM');
+export const getTimeFormat = (dueDate) => dayjs(dueDate).format('HH:MM');
 
 export const generateRuntime = (runtime) => {
   const hour = dayjs.duration(runtime, 'm').format('H');
