@@ -12,6 +12,7 @@ import Button from '../view/show-more-button.js';
 import Sorting from '../view/sort.js';
 import Movie from './movie.js';
 import Loading from '../view/loading.js';
+import NumbersFilms from '../view/footer.js';
 
 export const MOVIE_CARDS_COUNT = 5;
 export const TOPRATED_MOVIES_COUNT = 2;
@@ -201,6 +202,13 @@ export default class Page {
     this._renderFilms(0, count, container, sortedFilms, presenter);
   }
 
+  _renderFooter(films) {
+    this._numbersFilms = new NumbersFilms(films);
+    const siteFooterElement = document.querySelector('.footer');
+    const siteFooterSectionElement = siteFooterElement.querySelector('.footer__statistics');
+    render(siteFooterSectionElement, this._numbersFilms, renderPosition.BEFOREEND);
+  }
+
   _renderFilmList() {
     if (this._isLoading) {
       this._renderLoading();
@@ -245,6 +253,8 @@ export default class Page {
         MOST_COMMENTED_FILMS,
         this._commentedFilmPresenter,
       );
+
+      this._renderFooter(this._filmsModel.getFilms());
     }
   }
 
