@@ -5,34 +5,39 @@ import { Mode, UserAction, UpdateType, Pages } from '../constants.js';
 
 
 export default class Movie {
-  constructor(container, changeData, changeMode, filterType) {
+  constructor(container, changeData, changeMode, filterType, api, commentsModel) {
     this._container = container;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._filterType = filterType;
+    this._api = api;
+    this._commentsModel = commentsModel;
+
     this._bodyElement = document.querySelector('body');
     this._filmComponent = null;
     this._popupComponent = null;
     this._mode = Mode.DEFAULT;
-    this._filterType = filterType;
+    this._comments = [];
+
     this._clickHandler = this._clickHandler.bind(this);
     this._clickClose = this._clickClose.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleHistoryClick = this._handleHistoryClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+
+    this._handleFethcedComments = this._handleFethcedComments.bind(this);
+    this._commentsModel.subscribe(this._handleFethcedComments);
   }
 
   init(film, scrollPosition) {
     this._film = film;
-    this._comments = film.comments;
     this._scrollPosition = scrollPosition;
-    this._comments = this._getCommentsFilm(this._film);
-
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new Card(this._film);
-    this._popupComponent = new Popup(this._film, this._changeData, this._comments, this._scrollPosition, this._saveScroll);
+    this._popupComponent = new Popup(this._film, this._changeData, this._commentsModel, this._scrollPosition, this._saveScroll);
     this._filmComponent.setClickHandler(this._clickHandler);
     this._filmComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmComponent.setAlreadyWatchedClickHandler(this._handleHistoryClick);
@@ -54,26 +59,26 @@ export default class Movie {
     if (this._bodyElement.contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
+      this._getCommentsFilm(this._film);
 
       this._bodyElement.classList.add('hide-overflow');
       this._bodyElement.scroll(0, this._scrollPosition);
     }
   }
 
-  destroy() {
-    remove(this._filmComponent);
-    remove(this._popupComponent);
-  }
-
-  resetView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._onClosePopup();
+  _handleFethcedComments(updateType, film) {
+    if (film.id !== this._film.id) {
+      return;
     }
-  }
-
-  _getCommentsFilm(film) {
-    const commentsIds = film.comments;
-    return this._comments.filter((comment) => commentsIds.includes(comment.id));
+    switch (updateType) {
+      case UpdateType.PATCH:
+        if (document.querySelector('.film-details')) {
+          this._popupComponent.updateData(film, true);
+          return;
+        }
+        this._popupComponent.updateData(film, false);
+        render(this._bodyElement, this._popupComponent, renderPosition.BEFOREEND);
+    }
   }
 
   _handleFavoriteClick() {
@@ -130,6 +135,16 @@ export default class Movie {
     this._bodyElement.scrollTop = this._scrollPosition;
   }
 
+  _getCommentsFilm(film) {
+    this._api.getComments(film.id)
+      .then((comments) => {
+        this._commentsModel.setComments(UpdateType.PATCH, film, comments);
+      })
+      .catch(() => {
+        this._commentsModel.setComments(UpdateType.PATCH, film, []);
+      });
+  }
+
   _clickHandler() {
     this._openPopupFilm();
     document.addEventListener('keydown', this._onEscKeyDown);
@@ -146,10 +161,9 @@ export default class Movie {
       document.querySelector('.film-details').remove();
     }
     this._bodyElement.classList.add('hide-overflow');
-    render(this._bodyElement, this._popupComponent, renderPosition.BEFOREEND);
+    this._getCommentsFilm(this._film);
     this._changeMode();
     this._mode = Mode.POPUP;
-
   }
 
   _onClosePopup() {
@@ -175,5 +189,16 @@ export default class Movie {
 
   _saveScroll(scrollPosition) {
     this._scrollPosition = scrollPosition;
+  }
+
+  destroy() {
+    remove(this._filmComponent);
+    remove(this._popupComponent);
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._onClosePopup();
+    }
   }
 }

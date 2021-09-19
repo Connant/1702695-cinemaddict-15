@@ -49,7 +49,6 @@ export default class FilterNav {
 
   _getFilters() {
     const films = this._filmsModel.getFilms();
-
     return [
       {
         type: Pages.ALL,

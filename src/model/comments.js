@@ -6,8 +6,16 @@ export default class CommentsModel extends AbstractObserver {
     this._comments = [];
   }
 
-  setComments(comments) {
-    this._comments = comments.slice();
+  setComments(updateType, film, comments) {
+    this._comments.concat(comments);
+    const filmPayload = Object.assign(
+      {},
+      film,
+      {
+        comments: comments,
+      },
+    );
+    this._notify(updateType, filmPayload);
   }
 
   getComments() {
@@ -36,6 +44,34 @@ export default class CommentsModel extends AbstractObserver {
     ];
 
     this._notify(updateType, update, this._comments, scroll);
+  }
+
+  static adaptToClient(comment) {
+    const adaptedComment = Object.assign(
+      {},
+      comment,
+      {
+        comment: comment['comment'],
+        emoji: comment['emotion'],
+        date: comment['date'],
+        author: comment['author'],
+      });
+    delete adaptedComment['emotion'];
+    return adaptedComment;
+  }
+
+  static adaptToServer(comment) {
+    const adaptedComment = Object.assign(
+      {},
+      comment,
+      {
+        'comment': comment.comment,
+        'author': comment.author,
+        'emotion': comment.emoji,
+        'date': comment.date,
+      });
+    delete adaptedComment.emoji;
+    return adaptedComment;
   }
 
 }

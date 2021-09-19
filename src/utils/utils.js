@@ -40,8 +40,7 @@ export const generateDate = () => {
 
 export const getDayMonthFormat = (dueDate) => dayjs(dueDate).format('D MMMM');
 export const getYearsFormat = (dueDate) => dayjs(dueDate).format('YYYY');
-
-export const formatRuntime = (dueDate) => dayjs(dueDate).format('HH:MM');
+export const getTimeFormat = (dueDate) => dayjs(dueDate).format('HH:MM');
 
 export const generateRuntime = (runtime) => {
   const hour = dayjs.duration(runtime, 'm').format('H');
@@ -106,7 +105,7 @@ export const replace = (newChild, oldChild) => {
 
   const parent = oldChild.parentElement;
 
-  if (parent === null || oldChild === null || newChild === null) {
+  if (parent === null || newChild === null) {
     throw new Error('Can\'t replace unexisting elements');
   }
 

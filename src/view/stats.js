@@ -9,15 +9,15 @@ import { filter, getNumberFilmsGenre, getSortGenresFilms, completedFimsInDateRan
 const createFilmsChart = (statisticCtx, genresByFilms) => {
   const BAR_HEIGHT = 50;
 
-  const genres = Object.keys(genresByFilms);
+  const genre = Object.keys(genresByFilms);
   const numberFilms = Object.values(genresByFilms);
-  statisticCtx.height = BAR_HEIGHT * genres.length;
+  statisticCtx.height = BAR_HEIGHT * genre.length;
 
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: genres,
+      labels: genre,
       datasets: [{
         data: numberFilms,
         backgroundColor: '#ffe800',
