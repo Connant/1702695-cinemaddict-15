@@ -1,5 +1,5 @@
 import { generateRuntime, getTimeFormat, getDayMonthFormat, getYearsFormat } from '../utils/utils.js';
-import SmartView from './smart.js';
+import Smart from './smart.js';
 import { UserAction, UpdateType } from '../constants.js';
 import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
@@ -8,13 +8,13 @@ import he from 'he';
 const createCommentTemplate = (comment) => (
   ` <li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src=${comment.emoji} width="55" height="55" alt="emoji-smile">
+        <img src="images/emoji/${comment.emoji}.png" width="55" height="55" alt="emoji-smile">
       </span>
       <div>
         <p class="film-details__comment-text">${he.encode(comment.comment)}</p>
         <p class="film-details__comment-info" >
           <span class="film-details__comment-author">${comment.author}</span>
-          <span class="film-details__comment-day">${comment.date}</span>
+          <span class="film-details__comment-day">${getDayMonthFormat(comment.date)}</span>
           <button class="film-details__comment-delete" id=${comment.id}>Delete</button>
         </p>
       </div>
@@ -116,6 +116,7 @@ const createPopupTemplate = (data, newComment) => {
             <tr class="film-details__row">
               <td class="film-details__term">${isGenres}</td>
               <td class="film-details__cell" style="font-size:0">
+              ${movieInfo.genre.map((genre) => `<span class="film-details__genre" style="font-size:21px">${genre}</span>`)}
               </td>
             </tr>
           </table>
@@ -131,7 +132,7 @@ const createPopupTemplate = (data, newComment) => {
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
       <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-        ${comments ? createCommentsTemplate(data.comments) : ''}
+        ${comments ? createCommentsTemplate(comments) : ''}
         ${createNewCommentTemplate(newComment)}
       </section>
     </div>
@@ -139,24 +140,24 @@ const createPopupTemplate = (data, newComment) => {
 </section>`;
 };
 
-export default class Popup extends SmartView {
-  constructor(film, changeData, comments, scroll, saveScroll) {
+export default class Popup extends Smart {
+  constructor(film, changeData, commentsModel, scroll, saveScroll) {
     super();
-    this._comments = comments;
+    this._commentsModel = commentsModel;
     this._newComment = {};
-    this._data = Popup.parseFilmToData(film, comments);
     this._changeData = changeData;
+    this._data = Popup.parseFilmToData(film, []);
+    this._scrollPosition = scroll;
+    this._saveScroll = saveScroll;
+
+
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
     this._alreadyWatchedClickHandler = this._alreadyWatchedClickHandler.bind(this);
+    this._sendCommentHandler = this._sendCommentHandler.bind(this);
     this._textInputHandler = this._textInputHandler.bind(this);
     this._emojiHandler = this._emojiHandler.bind(this);
-    this._sendCommentHandler = this._sendCommentHandler.bind(this);
-
-    this._scrollPosition = scroll;
-    this._saveScroll = saveScroll;
-
     this._deleteCommentHandlers = this._deleteCommentHandlers.bind(this);
     this._scrollHandler = this._scrollHandler.bind(this);
 
@@ -164,7 +165,7 @@ export default class Popup extends SmartView {
   }
 
   getTemplate() {
-    return createPopupTemplate(this._data, this._newComment, this._comments);
+    return createPopupTemplate(this._data, this._newComment);
   }
 
   _clickHandler(evt) {
@@ -255,7 +256,6 @@ export default class Popup extends SmartView {
 
   _textInputHandler(evt) {
     evt.preventDefault();
-
     this._data = Object.assign(
       {},
       this._data,
@@ -264,7 +264,6 @@ export default class Popup extends SmartView {
         scrollPosition: this.getElement().scrollTop,
       },
     );
-
     this.updateNewComment(
       Object.assign(
         {},
@@ -278,7 +277,6 @@ export default class Popup extends SmartView {
 
   _emojiHandler(evt) {
     evt.preventDefault();
-
     this._data = Object.assign(
       {},
       this._data,
@@ -301,7 +299,6 @@ export default class Popup extends SmartView {
   _sendCommentHandler(evt) {
     if (evt.key === 'Enter') {
       evt.preventDefault();
-
       if (this._newComment.emoji && this._newComment.comment) {
         this._addingNewComment();
         this.updateData(

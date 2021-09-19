@@ -2,7 +2,7 @@ import { getTimeFormat, getYearsFormat } from '../utils/utils.js';
 import Abstract from './abstract.js';
 
 export const createMovieCardTemplate = (card) => {
-  const { movieInfo, userDetails } = card;
+  const { comments, movieInfo, userDetails } = card;
 
   const runtimeMovie = getTimeFormat(movieInfo.runtime);
 
@@ -18,11 +18,11 @@ export const createMovieCardTemplate = (card) => {
     <p class="film-card__info">
       <span class="film-card__year">${getYearsFormat(movieInfo.release.date)}</span>
       <span class="film-card__duration">${runtimeMovie}</span>
-      <span class="film-card__genre">${movieInfo.genre.slice(0, 1)}}</span>
+      <span class="film-card__genre">${movieInfo.genre.slice(0, 1)}</span>
     </p>
     <img src="${movieInfo.poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${movieInfo.description}</p>
-    <a class="film-card__comments">${movieInfo.commentsCount} comments</a>
+    <a class="film-card__comments">${comments.length} comments</a>
     <div class="film-card__controls">
       <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${watchlistClassActive}" type="button">Add to watchlist</button>
       <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${alreadyWatchedClassActive}" type="button">Mark as watched</button>
