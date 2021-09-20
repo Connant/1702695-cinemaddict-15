@@ -62,6 +62,31 @@ export default class Api {
     return response;
   }
 
+  addComment(film, comment) {
+    return this._load({
+      url: `comments/${film.id}`,
+      method: Method.POST,
+      body: JSON.stringify(CommentsModel.adaptToServer(comment)),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    })
+      .then(Api.toJSON)
+      .then((data) => {
+        const newFilm = MoviesModel.adaptToClient(data.movie);
+        const newComments = data.comments.map(CommentsModel.adaptToClient);
+        return {
+          film: newFilm,
+          comment: newComments,
+        };
+      });
+  }
+
+  deleteComment(comment) {
+    return this._load({
+      url: `comments/${comment.id}`,
+      method: Method.DELETE,
+    });
+  }
+
   static toJSON(response) {
     return response.json();
   }

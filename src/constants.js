@@ -50,10 +50,15 @@ export const Mode = {
 };
 
 export const CurrentType = {
-  All: 'all',
+  ALL: 'all',
   TODAY: 'today',
   WEEK: 'week',
   MONTH: 'month',
   YEAR: 'year',
 };
 
+export const UserLevel = {
+  NOVICE: 'Novice',
+  FAN: 'Fan',
+  MOVIE_BUFF: 'Movie buff',
+};

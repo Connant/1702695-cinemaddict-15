@@ -3,12 +3,11 @@ import dayjs from 'dayjs';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import { Pages, CurrentType } from '../constants';
+import { Pages, CurrentType, UserLevel } from '../constants';
 import { filter, getNumberFilmsGenre, getSortGenresFilms, completedFimsInDateRange } from '../utils/utils';
 
 const createFilmsChart = (statisticCtx, genresByFilms) => {
   const BAR_HEIGHT = 50;
-
   const genre = Object.keys(genresByFilms);
   const numberFilms = Object.values(genresByFilms);
   statisticCtx.height = BAR_HEIGHT * genre.length;
@@ -71,66 +70,66 @@ const createFilmsChart = (statisticCtx, genresByFilms) => {
   });
 };
 
-const createStatisticsTemplate = (data) => {
+const createRankTitle = (historyFilms) => {
+  let level = '';
+  if (historyFilms.length <= 10 && historyFilms.length > 0) {
+    level = UserLevel.NOVICE;
+  }
+  if (10 < historyFilms.length && historyFilms.length <= 20) {
+    level = UserLevel.FAN;
+  }
+  if (historyFilms.length > 20) {
+    level = UserLevel.MOVIE_BUFF;
+  }
+  return `<p class="statistic__rank">
+            Your rank
+            <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
+            <span class="statistic__rank-label">${level}</span>
+          </p>`;
+};
 
+const createStatisticsTemplate = (data) => {
   let films = [];
   let currentType = null;
-  let genre = null;
+  let genres = null;
   let totalDuration = 0;
-  let genresArray = [];
+  let sortGenres = [];
+  let historyFilms = [];
   if (data) {
     films = data.films;
+    historyFilms = films.filter((film) => film.userDetails.alreadyWatched);
     currentType = data.currentType;
-    genre = data.genre;
+    genres = data.genre;
     totalDuration = films.length !== 0 ? films.map((film) => film.movieInfo.runtime).reduce((a, b) => a + b) : 0;
-    genresArray = genre ? Object.keys(genre) : null;
+    sortGenres = genres ? Object.keys(genres) : null;
   }
-
   return `<section class="statistic">
-  <p class="statistic__rank">
-      Your rank
-      <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-      <span class="statistic__rank-label">Movie buff</span>
-    </p>
+    ${historyFilms.length !== 0 ? createRankTitle(historyFilms) : ''}
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-      id="statistic-all-time" value="allTime" ${currentType === CurrentType.All ? 'checked' : ''}>
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="allTime" ${currentType === CurrentType.ALL ? 'checked' : ''}>
       <label for="statistic-all-time" class="statistic__filters-label">All time</label>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-      id="statistic-today" value="today" ${currentType === CurrentType.TODAY ? 'checked' : ''}>
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today" ${currentType === CurrentType.TODAY ? 'checked' : ''}>
       <label for="statistic-today" class="statistic__filters-label">Today</label>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-      id="statistic-week" value="week" ${currentType === CurrentType.WEEK ? 'checked' : ''}>
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week" ${currentType === CurrentType.WEEK ? 'checked' : ''}>
       <label for="statistic-week" class="statistic__filters-label">Week</label>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-      id="statistic-month" value="month" ${currentType === CurrentType.MONTH ? 'checked' : ''}>
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month" ${currentType === CurrentType.MONTH ? 'checked' : ''}>
       <label for="statistic-month" class="statistic__filters-label">Month</label>
-
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter"
-      id="statistic-year" value="year" ${currentType === CurrentType.YEAR ? 'checked' : ''}>
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year" ${currentType === CurrentType.YEAR ? 'checked' : ''}>
       <label for="statistic-year" class="statistic__filters-label">Year</label>
     </form>
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">You watched</h4>
-
         <p class="statistic__item-text">${films.length} <span class="statistic__item-description">movies</span></p>
-
-        </li>
+      </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
-
         <p class="statistic__item-text">${dayjs.duration(totalDuration, 'm').format('H')} <span class="statistic__item-description">h</span> ${dayjs.duration(totalDuration, 'm').format('mm')} <span class="statistic__item-description">m</span></p>
-
-        </li>
+      </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">${genresArray.length !== 0 ? genresArray[0] : ''}</p>
+        <p class="statistic__item-text">${sortGenres.length !== 0 ? sortGenres[0] : ''}</p>
       </li>
     </ul>
     <div class="statistic__chart-wrap">
@@ -138,7 +137,6 @@ const createStatisticsTemplate = (data) => {
     </div>
   </section>`;
 };
-
 
 export default class Statistic extends Smart {
   constructor() {
@@ -163,7 +161,7 @@ export default class Statistic extends Smart {
     this._sortGenres = null;
     this._data = {
       films: this._filmsModel.getFilms(),
-      currentType: CurrentType.All,
+      currentType: CurrentType.ALL,
       genre: this._sortGenres,
     };
     this._getWatchedFilms(this._data.films);
@@ -171,8 +169,16 @@ export default class Statistic extends Smart {
     this.updateData(this._data);
   }
 
+  removeElement() {
+    super.removeElement();
+  }
+
   getTemplate() {
     return createStatisticsTemplate(this._data);
+  }
+
+  restoreHandlers() {
+    this._setCharts();
   }
 
   _getWatchedFilms(data) {
@@ -187,24 +193,19 @@ export default class Statistic extends Smart {
       });
   }
 
-  restoreHandlers() {
-    this._setCharts();
-  }
-
   _dateChangeHandler(evt) {
     evt.preventDefault();
     switch (evt.target.value) {
-      case CurrentType.All:
+      case CurrentType.ALL:
         this._getWatchedFilms(this._filmsModel.getFilms());
         this.updateData(Object.assign({},
           this._data,
           {
-            currentType: CurrentType.All,
+            currentType: CurrentType.ALL,
           }));
         this._setCharts();
         this.setData();
         break;
-
       case CurrentType.TODAY:
         this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._today, this._endToday, 'hour minute');
         this._getWatchedFilms(this._sortFilms);
@@ -216,9 +217,8 @@ export default class Statistic extends Smart {
         this._setCharts();
         this.setData();
         break;
-
       case CurrentType.WEEK:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._today, 'month day');
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._endToday, 'month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -230,7 +230,7 @@ export default class Statistic extends Smart {
         break;
 
       case CurrentType.MONTH:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastMonth, this._today, 'month day');
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastMonth, this._endToday, 'month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -242,7 +242,7 @@ export default class Statistic extends Smart {
         break;
 
       case CurrentType.YEAR:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastYear, this._today, 'year month day');
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastYear, this._endToday, 'year month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -257,7 +257,7 @@ export default class Statistic extends Smart {
 
   setData() {
     document.querySelector('.statistic__filters')
-      .addEventListener('click', this._dateChangeHandler);
+      .addEventListener('change', this._dateChangeHandler);
   }
 
   _setCharts() {

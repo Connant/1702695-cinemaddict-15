@@ -45,4 +45,13 @@ export default class Abstract {
   removeElement() {
     this._element = null;
   }
+
+  shake(element, callback) {
+    const TIME_ANIMATION = 600;
+    element.style.animation = `shake ${TIME_ANIMATION / 1000}s`;
+    setTimeout(() => {
+      this.getElement().style.animation = '';
+      callback();
+    }, TIME_ANIMATION);
+  }
 }

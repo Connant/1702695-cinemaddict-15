@@ -26,8 +26,8 @@ export default class Movie {
     this._handleHistoryClick = this._handleHistoryClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
 
-    this._handleFethcedComments = this._handleFethcedComments.bind(this);
-    this._commentsModel.subscribe(this._handleFethcedComments);
+    this._handleFetchedComments = this._handleFetchedComments.bind(this);
+    this._commentsModel.subscribe(this._handleFetchedComments);
   }
 
   init(film, scrollPosition) {
@@ -37,7 +37,7 @@ export default class Movie {
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new Card(this._film);
-    this._popupComponent = new Popup(this._film, this._changeData, this._commentsModel, this._scrollPosition, this._saveScroll);
+    this._popupComponent = new Popup(this._film, this._changeData, this._commentsModel, this._scrollPosition, this._saveScroll, this._api);
     this._filmComponent.setClickHandler(this._clickHandler);
     this._filmComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._filmComponent.setAlreadyWatchedClickHandler(this._handleHistoryClick);
@@ -59,14 +59,14 @@ export default class Movie {
     if (this._bodyElement.contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
-      this._getCommentsFilm(this._film);
 
+      this._getCommentsFilm(this._film);
       this._bodyElement.classList.add('hide-overflow');
       this._bodyElement.scroll(0, this._scrollPosition);
     }
   }
 
-  _handleFethcedComments(updateType, film) {
+  _handleFetchedComments(updateType, film) {
     if (film.id !== this._film.id) {
       return;
     }

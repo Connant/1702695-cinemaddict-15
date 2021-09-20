@@ -13,17 +13,20 @@ import Movie from './movie.js';
 import Loading from '../view/loading.js';
 import NumbersFilms from '../view/footer.js';
 
+import UserRunk from '../view/user-rank.js';
+
 export const MOVIE_CARDS_COUNT = 5;
 export const TOPRATED_MOVIES_COUNT = 2;
 export const MOST_COMMENTED_FILMS = 2;
 
 export default class Page {
-  constructor(mainElement, filmsModel, commentsModel, pageModel, api) {
+  constructor(mainElement, filmsModel, commentsModel, pageModel, api, headerElement) {
     this._mainElement = mainElement;
     this._filmsModel = filmsModel;
     this._commentsModel = commentsModel;
     this._pageModel = pageModel;
     this._api = api;
+    this._headerElement = headerElement;
 
     this._renderCount = MOVIE_CARDS_COUNT;
 
@@ -45,6 +48,8 @@ export default class Page {
     this._filmPresenter = new Map();
     this._topFilmPresenter = new Map();
     this._commentedFilmPresenter = new Map();
+
+    this._ratingComponent = new UserRunk(this._filmsModel.getFilms());
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -154,6 +159,10 @@ export default class Page {
     render(this._moviesContainer, this._noMovies, renderPosition.BEFOREEND);
   }
 
+  _renderRating() {
+    render(this._headerElement, this._ratingComponent.getElement(), renderPosition.BEFOREEND);
+  }
+
   _rerenderSortFilms(sortType) {
     const newSorting = new Sorting(sortType);
     newSorting.setSortTypeChangeHandler(this._handleSortTypeChange);
@@ -231,6 +240,7 @@ export default class Page {
       render(this._mainElement, this._noMovies());
     } else {
       this._renderFilmList();
+      this._renderRating();
 
       const filmsContainer = this._mainElement.querySelector('.films');
       const filmListExtraToprated = filmsContainer.querySelector('.films-list--toprated');
