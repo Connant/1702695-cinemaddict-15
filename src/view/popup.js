@@ -1,11 +1,9 @@
-import { generateRuntime, getTimeFormat, getDayMonthFormat, getYearsFormat } from '../utils/utils.js';
+import { generateRuntime, getDayMonthFormat, getYearsFormat } from '../utils/utils.js';
 import Smart from './smart.js';
 import { UserAction, UpdateType } from '../constants.js';
-import dayjs from 'dayjs';
-import { nanoid } from 'nanoid';
 import he from 'he';
 
-const createCommentTemplate = (comment) => (
+const createCommentTemplate = (comment, deletingId) => (
   ` <li class="film-details__comment">
       <span class="film-details__comment-emoji">
         <img src="images/emoji/${comment.emoji}.png" width="55" height="55" alt="emoji-smile">
@@ -15,25 +13,25 @@ const createCommentTemplate = (comment) => (
         <p class="film-details__comment-info" >
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${getDayMonthFormat(comment.date)}</span>
-          <button class="film-details__comment-delete" id=${comment.id}>Delete</button>
+          <button class="film-details__comment-delete" id=${comment.id}>${deletingId === comment.id ? 'Deleting...' : 'Delete'}</button>
         </p>
       </div>
     </li>`
 );
 
-const createCommentsTemplate = (comments) => (
+const createCommentsTemplate = (comments, deletingId) => (
   `<ul class="film-details__comments-list" style="font-size:0" >
-    ${comments.map((comment) => createCommentTemplate(comment))}
+    ${comments.map((comment) => createCommentTemplate(comment, deletingId))}
   </ul>`
 );
 
 const createEmojiTemplate = (generateComment) => (
-  ` <img src=${generateComment.emoji} width="55" height="55" alt="emoji-smile">`
+  ` <img src="images/emoji/${generateComment.emoji}.png" width="55" height="55" alt="emoji-smile">`
 );
 
 
-const createNewCommentTemplate = (generateComment) => (
-  ` <div class="film-details__new-comment">
+const createNewCommentTemplate = (generateComment, isDisabled) => (
+  ` <div class="film-details__new-comment ${isDisabled ? 'disabled' : ''}"">
   <div class="film-details__add-emoji-label">${generateComment.emoji ? createEmojiTemplate(generateComment) : ''}</div>
   <label class="film-details__comment-label">
     <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${generateComment.comment ? generateComment.comment : ''}</textarea>
@@ -60,7 +58,7 @@ const createNewCommentTemplate = (generateComment) => (
 
 
 const createPopupTemplate = (data, newComment) => {
-  const { comments, movieInfo, userDetails } = data;
+  const { comments, movieInfo, userDetails, isDisabled, deletingId } = data;
 
   const watchlistName = userDetails.watchlist ? 'film-details__control-button--active' : '';
   const watchedName = userDetails.alreadyWatched ? 'film-details__control-button--active' : '';
@@ -133,7 +131,7 @@ const createPopupTemplate = (data, newComment) => {
       <section class="film-details__comments-wrap">
       <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
         ${comments ? createCommentsTemplate(comments) : ''}
-        ${createNewCommentTemplate(newComment)}
+        ${createNewCommentTemplate(newComment, isDisabled, deletingId)}
       </section>
     </div>
   </form>
@@ -141,14 +139,13 @@ const createPopupTemplate = (data, newComment) => {
 };
 
 export default class Popup extends Smart {
-  constructor(film, changeData, commentsModel, scroll, saveScroll) {
+  constructor(film, changeData, commentsModel, api) {
     super();
     this._commentsModel = commentsModel;
     this._newComment = {};
     this._changeData = changeData;
     this._data = Popup.parseFilmToData(film, []);
-    this._scrollPosition = scroll;
-    this._saveScroll = saveScroll;
+    this._api = api;
 
 
     this._clickHandler = this._clickHandler.bind(this);
@@ -159,7 +156,6 @@ export default class Popup extends Smart {
     this._textInputHandler = this._textInputHandler.bind(this);
     this._emojiHandler = this._emojiHandler.bind(this);
     this._deleteCommentHandlers = this._deleteCommentHandlers.bind(this);
-    this._scrollHandler = this._scrollHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -171,7 +167,7 @@ export default class Popup extends Smart {
   _clickHandler(evt) {
     evt.preventDefault();
     this._newComment = {};
-    this._addingNewComment(
+    this._updateNewComment(
       Object.assign(
         {},
         this._newComment,
@@ -182,20 +178,20 @@ export default class Popup extends Smart {
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
-    this._saveScroll(this._scrollPosition);
-    this._callback.favoriteClick();
+    this._scrollPosition = this.getElement().scrollTop;
+    this._callback.favoriteClick(this._scrollPosition);
   }
 
   _watchlistClickHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
-    this._saveScroll(this._scrollPosition);
-    this._callback.watchlistClick();
+    this._callback.watchlistClick(this._scrollPosition);
   }
 
   _alreadyWatchedClickHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
-    this._saveScroll(this._scrollPosition);
-    this._callback.alreadyWatchedClick();
+    this._callback.alreadyWatchedClick(this._scrollPosition);
   }
 
   setFavoriteClickHandler(callback) {
@@ -226,13 +222,14 @@ export default class Popup extends Smart {
         comments: comments,
         scrollPosition: null,
         isComments: film.comments.length !== 0,
+        isDisabled: false,
+        deletingId: null,
       },
     );
   }
 
   static parseDataToFilm(data) {
     data = Object.assign({}, data);
-
     if (!data.isComments) {
       data.comments = [];
     }
@@ -240,7 +237,8 @@ export default class Popup extends Smart {
       delete data.scrollPosition;
     }
     delete data.isComments;
-
+    delete data.isDisabled;
+    delete data.deletingId;
     return data;
   }
 
@@ -251,7 +249,6 @@ export default class Popup extends Smart {
 
     const buttons = this.getElement().querySelectorAll('.film-details__comment-delete');
     Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandlers));
-    this.getElement().addEventListener('scroll', this._scrollHandler);
   }
 
   _textInputHandler(evt) {
@@ -264,7 +261,7 @@ export default class Popup extends Smart {
         scrollPosition: this.getElement().scrollTop,
       },
     );
-    this.updateNewComment(
+    this._updateNewComment(
       Object.assign(
         {},
         this._newComment,
@@ -276,22 +273,24 @@ export default class Popup extends Smart {
   }
 
   _emojiHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this._data = Object.assign(
       {},
       this._data,
       {
+        author: 'Iron Man',
         isComments: this._data.comments.length !== 0,
         scrollPosition: this.getElement().scrollTop,
       },
     );
 
-    this.updateNewComment(
+    this._updateNewComment(
       Object.assign(
         {},
         this._newComment,
         {
-          emoji: `images/emoji/${evt.target.value}.png`,
+          emoji: evt.target.value,
         },
       ));
   }
@@ -300,68 +299,92 @@ export default class Popup extends Smart {
     if (evt.key === 'Enter') {
       evt.preventDefault();
       if (this._newComment.emoji && this._newComment.comment) {
-        this._addingNewComment();
-        this.updateData(
-          Object.assign(
-            {},
-            this._data,
-            {
-              isComments: this._data.comments.length !== 0,
-            },
-          ),
-        );
-        this._data = Popup.parseDataToFilm(this._data);
+        this._scrollPosition = this.getElement().scrollTop;
+        this.updateData({
+          isDisabled: true,
+          deletingId: null,
+        });
+        this.getElement().scrollTop = this._scrollPosition;
+        this._api.addComment(this._data, this._newComment)
+          .then((response) => {
+            this._data = Popup.parseDataToFilm(this._data);
+            this._changeData(
+              UserAction.ADD_COMMENT,
+              UpdateType.PATCH,
+              response.film,
+              response.comment[response.comment.length - 1],
+              this._scrollPosition);
+          })
+          .catch(() => {
+            const resetDisabled = () => this.updateData({
+              isDisabled: false,
+              deletingId: null,
+            });
+            const newCommentsElement = this.getElement().querySelector('.film-details__new-comment');
+            this.shake(newCommentsElement, resetDisabled);
+          });
+        this._newComment = {};
       }
     }
   }
 
-  _addingNewComment() {
-    const dueDate = dayjs();
+  _updateNewComment(update, justDataUpdating) {
+    if (!update) {
+      return;
+    }
     this._newComment = Object.assign(
       {},
       this._newComment,
       {
-        id: nanoid(),
-        author: 'Iron Maaaan',
-        date: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
-      });
-
-    const comments = this._data.comments;
-    const newcomment = this._newComment;
-
-    comments[comments.length] = newcomment;
-    this._data = Object.assign(
-      {},
-      this._data,
-      {
-        comments: comments,
+        author: 'Iron Man',
       },
+      update,
     );
-    this._newComment = {};
-    this._changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, newcomment);
+    if (justDataUpdating) {
+      return;
+    }
+    this.updateElement();
   }
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();
+    this._scrollPosition = this.getElement().scrollTop;
     const updatedComments = this._delete(this._data.comments, evt.target.id);
     const index = this._data.comments.findIndex((comment) => comment.id === evt.target.id);
-    this._changeData(
-      UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
-      this._data.comments[index],
-      this._data,
-      this._scrollPosition,
-    );
-    this._changeData(
-      UserAction.UPDATE_FILM,
-      UpdateType.PATCH, Object.assign(
-        {},
-        this._data,
-        {
-          comments: updatedComments,
-        },
-      ), this._data.comments, this._scrollPosition);
+    this.updateData({
+      isDisabled: false,
+      deletingId: evt.target.id,
+    });
+    this.getElement().scrollTop = this._scrollPosition;
+    this._api.deleteComment(this._data.comments[index])
+      .then(() => {
+        this._data = Popup.parseDataToFilm(this._data);
+        this._changeData(
+          UserAction.DELETE_COMMENT,
+          UpdateType.PATCH,
+          this._data.comments[index],
+          this._data,
+          this._scrollPosition);
+        this._changeData(
+          UserAction.UPDATE_FILM,
+          UpdateType.PATCH,
+          Object.assign(
+            {},
+            this._data,
+            {
+              comments: updatedComments,
+            },
+          ), this._data.comments, this._scrollPosition);
 
+      })
+      .catch(() => {
+        const resetDisabled = () => this.updateData({
+          isDisabled: false,
+          deletingId: null,
+        });
+        const commentsElement = this.getElement().querySelector('.film-details__comments-list');
+        this.shake(commentsElement, resetDisabled);
+      });
   }
 
   _delete(comments, update) {
@@ -374,11 +397,6 @@ export default class Popup extends Smart {
   }
 
 
-  _scrollHandler(evt) {
-    evt.preventDefault();
-    this._scrollPosition = evt.target.offsetHeight;
-  }
-
   restoreHandlers() {
     this._setInnerHandlers();
     this.setClickHandler(this._callback.click);
@@ -387,3 +405,4 @@ export default class Popup extends Smart {
     this.setFavoriteClickHandler(this._callback.favoriteClick);
   }
 }
+

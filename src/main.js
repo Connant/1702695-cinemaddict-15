@@ -1,5 +1,4 @@
 import Page from './presenter/movie-page.js';
-import UserRunk from './view/user-rank';
 import Statistic from './view/stats.js';
 import FilterNav from './presenter/filters-navigation.js';
 import MoviesModel from './model/movies.js';
@@ -22,10 +21,9 @@ const filmsModel = new MoviesModel();
 const commentsModel = new CommentsModel();
 const pageModel = new PageModel();
 
-const pagePresenter = new Page(mainElement, filmsModel, commentsModel, pageModel, api);
+const pagePresenter = new Page(mainElement, filmsModel, commentsModel, pageModel, api, headerElement);
 const filterPresenter = new FilterNav(mainElement, pageModel, filmsModel, handleMenuClick);
 
-render(headerElement, new UserRunk().getElement(), renderPosition.BEFOREEND);
 
 filterPresenter.init();
 const statisticElement = new Statistic();

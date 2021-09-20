@@ -13,17 +13,20 @@ import Movie from './movie.js';
 import Loading from '../view/loading.js';
 import NumbersFilms from '../view/footer.js';
 
+import UserRunk from '../view/user-rank.js';
+
 export const MOVIE_CARDS_COUNT = 5;
 export const TOPRATED_MOVIES_COUNT = 2;
 export const MOST_COMMENTED_FILMS = 2;
 
 export default class Page {
-  constructor(mainElement, filmsModel, commentsModel, pageModel, api) {
+  constructor(mainElement, filmsModel, commentsModel, pageModel, api, headerElement) {
     this._mainElement = mainElement;
     this._filmsModel = filmsModel;
     this._commentsModel = commentsModel;
     this._pageModel = pageModel;
     this._api = api;
+    this._headerElement = headerElement;
 
     this._renderCount = MOVIE_CARDS_COUNT;
 
@@ -41,6 +44,7 @@ export default class Page {
     this._scrollPosition = null;
     this._menuComponent = null;
     this._noFilmsComponent = null;
+    this._ratingComponent = null;
 
     this._filmPresenter = new Map();
     this._topFilmPresenter = new Map();
@@ -111,6 +115,7 @@ export default class Page {
         if (this._commentedFilmPresenter.get(data.id)) {
           this._commentedFilmPresenter.get(data.id).init(data, scrollPosition);
         }
+        this._renderRating();
         break;
       case UpdateType.MINOR:
         this._clearPage();
@@ -154,6 +159,13 @@ export default class Page {
     render(this._moviesContainer, this._noMovies, renderPosition.BEFOREEND);
   }
 
+  _renderRating() {
+    this._ratingComponent.getElement().remove();
+    this._ratingComponent.removeElement();
+    this._ratingComponent = new UserRunk(this._filmsModel.getFilms());
+    render(this._headerElement, this._ratingComponent.getElement(), renderPosition.BEFOREEND);
+  }
+
   _rerenderSortFilms(sortType) {
     const newSorting = new Sorting(sortType);
     newSorting.setSortTypeChangeHandler(this._handleSortTypeChange);
@@ -162,8 +174,8 @@ export default class Page {
   }
 
   _renderSortFilms() {
+    this._rerenderSortFilms(this._currentSortType);
     render(this._mainElement, this._sortFilms, renderPosition.BEFOREEND);
-    this._sortFilms.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderFilm(filmListElement, film, presenter) {
@@ -182,6 +194,10 @@ export default class Page {
 
   _renderFilmList() {
     this._renderSortFilms();
+    if (this._ratingComponent === null) {
+      this._ratingComponent = new UserRunk(this._filmsModel.getFilms());
+      this._renderRating();
+    }
     render(this._mainElement, this._moviesContainer, renderPosition.BEFOREEND);
     const films = this._getFilms();
     const filmsCount = films.length;

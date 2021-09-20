@@ -150,11 +150,11 @@ export const getNumberFilmsGenre = (films) => {
   const result = {};
   genres.forEach((genre) => {
     result[genre] = 0;
-    films.forEach((film) => {
-      if (genre === film.movieInfo.genre) {
+    films.forEach((film) => film.movieInfo.genre.forEach((item) => {
+      if (genre === item) {
         result[genre] += 1;
       }
-    });
+    }));
   });
   return result;
 };
