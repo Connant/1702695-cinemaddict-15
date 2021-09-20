@@ -4,20 +4,20 @@ const userRunkTemplate = (films) => {
 
   const getProfileRating = (elements) => {
     if (elements >= 1 && elements < 10) {
-      return 'novice';
+      return 'Novice';
     }
     if (elements >= 10 && elements < 20) {
-      return 'fan';
+      return 'Fan';
     }
     if (elements >= 21) {
-      return 'movie buf';
+      return 'Movie-Buff';
     }
     if (elements === 0) {
       return '';
     }
   };
 
-  const watchedFilms = films.filter((film) => film.movieInfo.userDetails.watchlist === true);
+  const watchedFilms = films.filter((film) => film.userDetails.alreadyWatched === true);
 
   return `<section class="header__profile profile">
     <p class="profile__rating">${getProfileRating(watchedFilms.length)}</p>

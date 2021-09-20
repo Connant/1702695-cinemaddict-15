@@ -139,14 +139,12 @@ const createPopupTemplate = (data, newComment) => {
 };
 
 export default class Popup extends Smart {
-  constructor(film, changeData, commentsModel, scroll, saveScroll, api) {
+  constructor(film, changeData, commentsModel, api) {
     super();
     this._commentsModel = commentsModel;
     this._newComment = {};
     this._changeData = changeData;
     this._data = Popup.parseFilmToData(film, []);
-    this._scrollPosition = scroll;
-    this._saveScroll = saveScroll;
     this._api = api;
 
 
@@ -158,7 +156,6 @@ export default class Popup extends Smart {
     this._textInputHandler = this._textInputHandler.bind(this);
     this._emojiHandler = this._emojiHandler.bind(this);
     this._deleteCommentHandlers = this._deleteCommentHandlers.bind(this);
-    this._scrollHandler = this._scrollHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -181,20 +178,20 @@ export default class Popup extends Smart {
 
   _favoriteClickHandler(evt) {
     evt.preventDefault();
-    this._saveScroll(this._scrollPosition);
-    this._callback.favoriteClick();
+    this._scrollPosition = this.getElement().scrollTop;
+    this._callback.favoriteClick(this._scrollPosition);
   }
 
   _watchlistClickHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
-    this._saveScroll(this._scrollPosition);
-    this._callback.watchlistClick();
+    this._callback.watchlistClick(this._scrollPosition);
   }
 
   _alreadyWatchedClickHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
-    this._saveScroll(this._scrollPosition);
-    this._callback.alreadyWatchedClick();
+    this._callback.alreadyWatchedClick(this._scrollPosition);
   }
 
   setFavoriteClickHandler(callback) {
@@ -252,7 +249,6 @@ export default class Popup extends Smart {
 
     const buttons = this.getElement().querySelectorAll('.film-details__comment-delete');
     Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandlers));
-    this.getElement().addEventListener('scroll', this._scrollHandler);
   }
 
   _textInputHandler(evt) {
@@ -277,6 +273,7 @@ export default class Popup extends Smart {
   }
 
   _emojiHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this._data = Object.assign(
       {},
@@ -302,10 +299,12 @@ export default class Popup extends Smart {
     if (evt.key === 'Enter') {
       evt.preventDefault();
       if (this._newComment.emoji && this._newComment.comment) {
+        this._scrollPosition = this.getElement().scrollTop;
         this.updateData({
           isDisabled: true,
           deletingId: null,
         });
+        this.getElement().scrollTop = this._scrollPosition;
         this._api.addComment(this._data, this._newComment)
           .then((response) => {
             this._data = Popup.parseDataToFilm(this._data);
@@ -346,41 +345,17 @@ export default class Popup extends Smart {
     }
     this.updateElement();
   }
-  // _addingNewComment() {
-  //   const dueDate = dayjs();
-  //   this._newComment = Object.assign(
-  //     {},
-  //     this._newComment,
-  //     {
-  //       id: nanoid(),
-  //       author: 'Iron Maaaan',
-  //       date: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
-  //     });
-
-  //   const comments = this._data.comments;
-  //   const newcomment = this._newComment;
-
-  //   comments[comments.length] = newcomment;
-  //   this._data = Object.assign(
-  //     {},
-  //     this._data,
-  //     {
-  //       comments: comments,
-  //     },
-  //   );
-  //   this._newComment = {};
-  //   this._changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, newcomment);
-  // }
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();
-    //this._scrollPosition = this.getElement().scrollTop;
+    this._scrollPosition = this.getElement().scrollTop;
     const updatedComments = this._delete(this._data.comments, evt.target.id);
     const index = this._data.comments.findIndex((comment) => comment.id === evt.target.id);
     this.updateData({
       isDisabled: false,
       deletingId: evt.target.id,
     });
+    this.getElement().scrollTop = this._scrollPosition;
     this._api.deleteComment(this._data.comments[index])
       .then(() => {
         this._data = Popup.parseDataToFilm(this._data);
@@ -421,11 +396,6 @@ export default class Popup extends Smart {
     return el;
   }
 
-
-  _scrollHandler(evt) {
-    evt.preventDefault();
-    this._scrollPosition = evt.target.offsetHeight;
-  }
 
   restoreHandlers() {
     this._setInnerHandlers();

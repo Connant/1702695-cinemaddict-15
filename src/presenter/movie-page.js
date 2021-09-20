@@ -44,12 +44,11 @@ export default class Page {
     this._scrollPosition = null;
     this._menuComponent = null;
     this._noFilmsComponent = null;
+    this._ratingComponent = null;
 
     this._filmPresenter = new Map();
     this._topFilmPresenter = new Map();
     this._commentedFilmPresenter = new Map();
-
-    this._ratingComponent = new UserRunk(this._filmsModel.getFilms());
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -116,6 +115,7 @@ export default class Page {
         if (this._commentedFilmPresenter.get(data.id)) {
           this._commentedFilmPresenter.get(data.id).init(data, scrollPosition);
         }
+        this._renderRating();
         break;
       case UpdateType.MINOR:
         this._clearPage();
@@ -160,6 +160,9 @@ export default class Page {
   }
 
   _renderRating() {
+    this._ratingComponent.getElement().remove();
+    this._ratingComponent.removeElement();
+    this._ratingComponent = new UserRunk(this._filmsModel.getFilms());
     render(this._headerElement, this._ratingComponent.getElement(), renderPosition.BEFOREEND);
   }
 
@@ -171,8 +174,8 @@ export default class Page {
   }
 
   _renderSortFilms() {
+    this._rerenderSortFilms(this._currentSortType);
     render(this._mainElement, this._sortFilms, renderPosition.BEFOREEND);
-    this._sortFilms.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderFilm(filmListElement, film, presenter) {
@@ -191,6 +194,10 @@ export default class Page {
 
   _renderFilmList() {
     this._renderSortFilms();
+    if (this._ratingComponent === null) {
+      this._ratingComponent = new UserRunk(this._filmsModel.getFilms());
+      this._renderRating();
+    }
     render(this._mainElement, this._moviesContainer, renderPosition.BEFOREEND);
     const films = this._getFilms();
     const filmsCount = films.length;
@@ -240,7 +247,6 @@ export default class Page {
       render(this._mainElement, this._noMovies());
     } else {
       this._renderFilmList();
-      this._renderRating();
 
       const filmsContainer = this._mainElement.querySelector('.films');
       const filmListExtraToprated = filmsContainer.querySelector('.films-list--toprated');

@@ -50,7 +50,7 @@ export const Mode = {
 };
 
 export const CurrentType = {
-  ALL: 'all',
+  ALL: 'allTime',
   TODAY: 'today',
   WEEK: 'week',
   MONTH: 'month',

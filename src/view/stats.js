@@ -71,20 +71,24 @@ const createFilmsChart = (statisticCtx, genresByFilms) => {
 };
 
 const createRankTitle = (historyFilms) => {
-  let level = '';
-  if (historyFilms.length <= 10 && historyFilms.length > 0) {
-    level = UserLevel.NOVICE;
-  }
-  if (10 < historyFilms.length && historyFilms.length <= 20) {
-    level = UserLevel.FAN;
-  }
-  if (historyFilms.length > 20) {
-    level = UserLevel.MOVIE_BUFF;
-  }
+  const getProfileRating = (elements) => {
+    if (elements >= 1 && elements < 10) {
+      return UserLevel.NOVICE;
+    }
+    if (elements >= 10 && elements < 20) {
+      return UserLevel.FAN;
+    }
+    if (elements >= 21) {
+      return UserLevel.MOVIE_BUFF;
+    }
+    if (elements === 0) {
+      return '';
+    }
+  };
   return `<p class="statistic__rank">
             Your rank
             <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-            <span class="statistic__rank-label">${level}</span>
+            <span class="statistic__rank-label">${getProfileRating(historyFilms.length)}</span>
           </p>`;
 };
 
@@ -103,8 +107,10 @@ const createStatisticsTemplate = (data) => {
     totalDuration = films.length !== 0 ? films.map((film) => film.movieInfo.runtime).reduce((a, b) => a + b) : 0;
     sortGenres = genres ? Object.keys(genres) : null;
   }
+  const formatRuntime = (totalMin) => `<p class="statistic__item-text">${Math.floor(totalMin / 60)}<span class="statistic__item-description">h</span>${totalMin % 60}<span class="statistic__item-description">m</span></p>`;
+
   return `<section class="statistic">
-    ${historyFilms.length !== 0 ? createRankTitle(historyFilms) : ''}
+    ${historyFilms.length !== 0 ? createRankTitle(data.films) : ''}
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
       <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="allTime" ${currentType === CurrentType.ALL ? 'checked' : ''}>
@@ -125,7 +131,7 @@ const createStatisticsTemplate = (data) => {
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">${dayjs.duration(totalDuration, 'm').format('H')} <span class="statistic__item-description">h</span> ${dayjs.duration(totalDuration, 'm').format('mm')} <span class="statistic__item-description">m</span></p>
+        ${formatRuntime(totalDuration)}
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
@@ -181,6 +187,15 @@ export default class Statistic extends Smart {
     this._setCharts();
   }
 
+  _getFilmsHistory(data) {
+    const films = filter[Pages.HISTORY](data);
+    this._data = Object.assign({},
+      this._data,
+      {
+        films: films,
+      });
+  }
+
   _getWatchedFilms(data) {
     const films = filter[Pages.HISTORY](data);
     const genresByFilms = getNumberFilmsGenre(films);
@@ -209,7 +224,9 @@ export default class Statistic extends Smart {
       case CurrentType.TODAY:
         this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._today, this._endToday, 'hour minute');
         this._getWatchedFilms(this._sortFilms);
-        this.updateData(Object.assign({}, this._data,
+        this.updateData(Object.assign(
+          {},
+          this._data,
           {
             currentType: CurrentType.TODAY,
           },
