@@ -142,7 +142,7 @@ export default class Page {
     const newRenderedCount = Math.min(films.length, this._renderCount + 5);
     this._renderFilms(this._renderCount, newRenderedCount, filmsListContainer, films, this._filmPresenter);
     this._renderCount = newRenderedCount;
-    if (this._renderCount >= this._filmsModel.getFilms().length) {
+    if (this._renderCount >= films.length) {
       remove(this._showMoreButton);
     }
   }

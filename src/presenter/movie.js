@@ -76,9 +76,27 @@ export default class Movie {
           return;
         }
         this._popupComponent.updateData(film, false);
+        if (this._popupComponent !== null) {
+          this._popupComponent.removeElement();
+        }
         render(this._bodyElement, this._popupComponent, renderPosition.BEFOREEND);
+        this._popupComponent.restoreHandlers();
+        break;
+      case UpdateType.MINOR:
+        if (document.querySelector('.film-details')) {
+          this._popupComponent.updateData(film, false);
+          return;
+        }
+        this._popupComponent.updateData(film, false);
+        if (this._popupComponent !== null) {
+          this._popupComponent.removeElement();
+        }
+        render(this._bodyElement, this._popupComponent, renderPosition.BEFOREEND);
+        this._popupComponent.restoreHandlers();
+        break;
     }
   }
+
 
   _handleFavoriteClick(scroll) {
     this._changeData(
@@ -134,7 +152,7 @@ export default class Movie {
   _getCommentsFilm(film) {
     this._api.getComments(film.id)
       .then((comments) => {
-        this._commentsModel.setComments(UpdateType.PATCH, film, comments);
+        this._commentsModel.setComments(UpdateType.MINOR, film, comments);
       })
       .catch(() => {
         this._commentsModel.setComments(UpdateType.PATCH, film, []);
