@@ -279,7 +279,6 @@ export default class Popup extends Smart {
       {},
       this._data,
       {
-        author: 'Iron Man',
         isComments: this._data.comments.length !== 0,
         scrollPosition: this.getElement().scrollTop,
       },
@@ -303,15 +302,15 @@ export default class Popup extends Smart {
         this.updateData({
           isDisabled: true,
           deletingId: null,
-        });
+        }, true);
         this.getElement().scrollTop = this._scrollPosition;
         this._api.addComment(this._data, this._newComment)
           .then((response) => {
-            this._data = Popup.parseDataToFilm(this._data);
+            this.updateData({ comments: response.comment }, true);
             this._changeData(
               UserAction.ADD_COMMENT,
-              UpdateType.PATCH,
-              response.film,
+              UpdateType.MINOR,
+              this._data,
               response.comment[response.comment.length - 1],
               this._scrollPosition);
           })
@@ -335,9 +334,6 @@ export default class Popup extends Smart {
     this._newComment = Object.assign(
       {},
       this._newComment,
-      {
-        author: 'Iron Man',
-      },
       update,
     );
     if (justDataUpdating) {
@@ -351,18 +347,16 @@ export default class Popup extends Smart {
     this._scrollPosition = this.getElement().scrollTop;
     const updatedComments = this._delete(this._data.comments, evt.target.id);
     const index = this._data.comments.findIndex((comment) => comment.id === evt.target.id);
-    this.updateData({
-      isDisabled: false,
-      deletingId: evt.target.id,
-    });
+    const deletedComment = this._data.comments[index];
+
+    this.updateData({ comments: updatedComments }, true);
     this.getElement().scrollTop = this._scrollPosition;
-    this._api.deleteComment(this._data.comments[index])
+    this._api.deleteComment(deletedComment)
       .then(() => {
-        this._data = Popup.parseDataToFilm(this._data);
         this._changeData(
           UserAction.DELETE_COMMENT,
-          UpdateType.PATCH,
-          this._data.comments[index],
+          UpdateType.MINOR,
+          deletedComment,
           this._data,
           this._scrollPosition);
         this._changeData(
@@ -375,7 +369,6 @@ export default class Popup extends Smart {
               comments: updatedComments,
             },
           ), this._data.comments, this._scrollPosition);
-
       })
       .catch(() => {
         const resetDisabled = () => this.updateData({

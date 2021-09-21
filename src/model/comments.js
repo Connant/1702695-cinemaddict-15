@@ -7,7 +7,7 @@ export default class CommentsModel extends AbstractObserver {
   }
 
   setComments(updateType, film, comments) {
-    this._comments.concat(comments);
+    this._comments = this._comments.concat(comments);
     const filmPayload = Object.assign(
       {},
       film,
@@ -25,13 +25,13 @@ export default class CommentsModel extends AbstractObserver {
   addComment(updateType, update, comments, scroll) {
     this._comments = [
       ...this._comments,
-      update,
+      comments,
     ];
 
     this._notify(updateType, update, this._comments, scroll);
   }
 
-  deleteComment(updateType, update, comments, scroll) {
+  deleteComment(updateType, update, film) {
     const index = this._comments.findIndex((comment) => comment.id === update.id);
 
     if (index === -1) {
@@ -43,7 +43,7 @@ export default class CommentsModel extends AbstractObserver {
       ...this._comments.slice(index + 1),
     ];
 
-    this._notify(updateType, update, this._comments, scroll);
+    this._notify(updateType, film);
   }
 
   static adaptToClient(comment) {
