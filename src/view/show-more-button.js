@@ -1,7 +1,7 @@
 import Abstract from './abstract.js';
 
 
-export const showMoreButtonTemplate = () => `<button class="films-list__show-more">Show more</button>`; // eslint-disable-line
+export const showMoreButtonTemplate = () => '<button class="films-list__show-more">Show more</button>';
 
 export default class Button extends Abstract {
   constructor() {
