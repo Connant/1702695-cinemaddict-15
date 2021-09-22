@@ -295,7 +295,7 @@ export default class Popup extends Smart {
   }
 
   _sendCommentHandler(evt) {
-    if (evt.key === 'Enter') {
+    if (evt.ctrlKey && evt.key === 'Enter') {
       evt.preventDefault();
       if (this._newComment.emoji && this._newComment.comment) {
         this._scrollPosition = this.getElement().scrollTop;
@@ -359,16 +359,6 @@ export default class Popup extends Smart {
           deletedComment,
           this._data,
           this._scrollPosition);
-        this._changeData(
-          UserAction.UPDATE_FILM,
-          UpdateType.PATCH,
-          Object.assign(
-            {},
-            this._data,
-            {
-              comments: updatedComments,
-            },
-          ), this._data.comments, this._scrollPosition);
       })
       .catch(() => {
         const resetDisabled = () => this.updateData({

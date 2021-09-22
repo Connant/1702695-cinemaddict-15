@@ -1,16 +1,17 @@
 import Abstract from './abstract.js';
+import { UserLevel } from '../constants';
 
-const userRunkTemplate = (films) => {
+export const userRunkTemplate = (films) => {
 
   const getProfileRating = (elements) => {
     if (elements >= 1 && elements < 10) {
-      return 'Novice';
+      return UserLevel.NOVICE;
     }
     if (elements >= 10 && elements < 20) {
-      return 'Fan';
+      return UserLevel.FAN;
     }
     if (elements >= 21) {
-      return 'Movie-Buff';
+      return UserLevel.MOVIE_BUFF;
     }
     if (elements === 0) {
       return '';

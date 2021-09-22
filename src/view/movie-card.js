@@ -21,7 +21,7 @@ export const createMovieCardTemplate = (card) => {
       <span class="film-card__genre">${movieInfo.genre.slice(0, 1)}</span>
     </p>
     <img src="${movieInfo.poster}" alt="" class="film-card__poster">
-    <p class="film-card__description">${movieInfo.description}</p>
+    <p class="film-card__description">${movieInfo.description.length < 140 ? movieInfo.description : `${movieInfo.description.slice(0, 140)}...`}</p>
     <a class="film-card__comments">${comments.length} comments</a>
     <div class="film-card__controls">
       <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${watchlistClassActive}" type="button">Add to watchlist</button>

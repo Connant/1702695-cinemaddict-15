@@ -120,6 +120,7 @@ export default class Page {
       case UpdateType.MINOR:
         this._clearPage();
         this._renderFilmList();
+        this._renderAdditionalFilmsBlock();
         break;
       case UpdateType.MAJOR:
         this._clearPage({ resetRenderedFilmsCount: true, resetSortType: true });
@@ -229,6 +230,24 @@ export default class Page {
     this._renderFilms(0, count, container, sortedFilms, presenter);
   }
 
+  _renderAdditionalFilmsBlock() {
+    const filmsContainer = this._mainElement.querySelector('.films');
+    const filmListExtraToprated = filmsContainer.querySelector('.films-list--toprated');
+    const filmTopratedContainer = filmListExtraToprated.querySelector('.films-list__container');
+    const filmListExtraMostCommented = filmsContainer.querySelector('.films-list--most-commented');
+    const filmMostCommentedContainer = filmListExtraMostCommented.querySelector('.films-list__container');
+    this._renderAdditionalFilmList(filmTopratedContainer,
+      topSortFunction,
+      TOPRATED_MOVIES_COUNT,
+      this._topFilmPresenter,
+    );
+    this._renderAdditionalFilmList(filmMostCommentedContainer,
+      commentedSortFunction,
+      MOST_COMMENTED_FILMS,
+      this._commentedFilmPresenter,
+    );
+  }
+
   _renderFooter(films) {
     this._numbersFilms = new NumbersFilms(films);
     const siteFooterElement = document.querySelector('.footer');
@@ -247,22 +266,7 @@ export default class Page {
       render(this._mainElement, this._noMovies());
     } else {
       this._renderFilmList();
-
-      const filmsContainer = this._mainElement.querySelector('.films');
-      const filmListExtraToprated = filmsContainer.querySelector('.films-list--toprated');
-      const filmTopratedContainer = filmListExtraToprated.querySelector('.films-list__container');
-      const filmListExtraMostCommented = filmsContainer.querySelector('.films-list--most-commented');
-      const filmMostCommentedContainer = filmListExtraMostCommented.querySelector('.films-list__container');
-      this._renderAdditionalFilmList(filmTopratedContainer,
-        topSortFunction,
-        TOPRATED_MOVIES_COUNT,
-        this._topFilmPresenter,
-      );
-      this._renderAdditionalFilmList(filmMostCommentedContainer,
-        commentedSortFunction,
-        MOST_COMMENTED_FILMS,
-        this._commentedFilmPresenter,
-      );
+      this._renderAdditionalFilmsBlock();
 
       this._renderFooter(this._filmsModel.getFilms());
     }
