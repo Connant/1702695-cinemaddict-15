@@ -1,28 +1,22 @@
-import {
-  render, renderPosition, remove, replace, filter,
-  topSortFunction, commentedSortFunction, sortDate, sortRating
-} from '../utils/utils.js';
-import {
-  SortType, UserAction, UpdateType, Pages
-} from '../constants.js';
-import MoviesContainer from '../view/films-container';
+import { render, renderPosition, remove, replace } from '../utils/render.js';
+import { SortType, UserAction, UpdateType, Pages,
+  MOVIE_CARDS_COUNT, TOPRATED_MOVIES_COUNT, MOST_COMMENTED_FILMS } from '../constants.js';
+import { filter, topSort, commentedSort, sortDate, sortRating } from '../utils/filters.js';
+
+import MoviesContainer from '../view/movies-container';
 import NoMovies from '../view/no-movies.js';
-import Button from '../view/show-more-button.js';
-import Sorting from '../view/sort.js';
+import ShowMoreButton from '../view/show-more-button.js';
+import Sorting from '../view/sorting.js';
 import Movie from './movie.js';
 import Loading from '../view/loading.js';
-import NumbersFilms from '../view/footer.js';
+import TotalMoviesCount from '../view/total-movies-count.js';
+import UserRank from '../view/user-rank.js';
 
-import UserRunk from '../view/user-rank.js';
-
-export const MOVIE_CARDS_COUNT = 5;
-export const TOPRATED_MOVIES_COUNT = 2;
-export const MOST_COMMENTED_FILMS = 2;
 
 export default class Page {
-  constructor(mainElement, filmsModel, commentsModel, pageModel, api, headerElement) {
+  constructor(mainElement, moviesModel, commentsModel, pageModel, api, headerElement) {
     this._mainElement = mainElement;
-    this._filmsModel = filmsModel;
+    this._moviesModel = moviesModel;
     this._commentsModel = commentsModel;
     this._pageModel = pageModel;
     this._api = api;
@@ -31,7 +25,7 @@ export default class Page {
     this._renderCount = MOVIE_CARDS_COUNT;
 
     this._moviesContainer = new MoviesContainer();
-    this._showMoreButton = new Button();
+    this._showMoreButton = new ShowMoreButton();
     this._noMovies = new NoMovies();
     this._loadingComponent = new Loading();
     this._currentSortType = SortType.DEFAULT;
@@ -56,7 +50,7 @@ export default class Page {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
-    this._filmsModel.subscribe(this._handleModelEvent);
+    this._moviesModel.subscribe(this._handleModelEvent);
     this._pageModel.subscribe(this._handleModelEvent);
   }
 
@@ -66,7 +60,7 @@ export default class Page {
   }
 
   _getFilms() {
-    const films = this._filmsModel.getFilms();
+    const films = this._moviesModel.getFilms();
     const filtredFilms = filter[this._filterType](films);
     switch (this._currentSortType) {
       case SortType.DATE:
@@ -91,7 +85,7 @@ export default class Page {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
         this._api.updateFilm(update).then((response) => {
-          this._filmsModel.updateFilm(updateType, response, comments, scrollPosition);
+          this._moviesModel.updateFilm(updateType, response, comments, scrollPosition);
         });
         break;
       case UserAction.ADD_COMMENT:
@@ -140,7 +134,7 @@ export default class Page {
     const filmsList = filmsContainer.querySelector('.films-list');
     const filmsListContainer = filmsList.querySelector('.films-list__container');
     const films = this._getFilms();
-    const newRenderedCount = Math.min(films.length, this._renderCount + 5);
+    const newRenderedCount = Math.min(films.length, this._renderCount + MOVIE_CARDS_COUNT);
     this._renderFilms(this._renderCount, newRenderedCount, filmsListContainer, films, this._filmPresenter);
     this._renderCount = newRenderedCount;
     if (this._renderCount >= films.length) {
@@ -163,7 +157,7 @@ export default class Page {
   _renderRating() {
     this._ratingComponent.getElement().remove();
     this._ratingComponent.removeElement();
-    this._ratingComponent = new UserRunk(this._filmsModel.getFilms());
+    this._ratingComponent = new UserRank(this._moviesModel.getFilms());
     render(this._headerElement, this._ratingComponent.getElement(), renderPosition.BEFOREEND);
   }
 
@@ -196,7 +190,7 @@ export default class Page {
   _renderFilmList() {
     this._renderSortFilms();
     if (this._ratingComponent === null) {
-      this._ratingComponent = new UserRunk(this._filmsModel.getFilms());
+      this._ratingComponent = new UserRank(this._moviesModel.getFilms());
       this._renderRating();
     }
     render(this._mainElement, this._moviesContainer, renderPosition.BEFOREEND);
@@ -226,7 +220,7 @@ export default class Page {
   }
 
   _renderAdditionalFilmList(container, sortFunction, count = 2, presenter) {
-    const sortedFilms = sortFunction(this._filmsModel.getFilms()).slice(0, 2);
+    const sortedFilms = sortFunction(this._moviesModel.getFilms()).slice(0, 2);
     this._renderFilms(0, count, container, sortedFilms, presenter);
   }
 
@@ -237,22 +231,22 @@ export default class Page {
     const filmListExtraMostCommented = filmsContainer.querySelector('.films-list--most-commented');
     const filmMostCommentedContainer = filmListExtraMostCommented.querySelector('.films-list__container');
     this._renderAdditionalFilmList(filmTopratedContainer,
-      topSortFunction,
+      topSort,
       TOPRATED_MOVIES_COUNT,
       this._topFilmPresenter,
     );
     this._renderAdditionalFilmList(filmMostCommentedContainer,
-      commentedSortFunction,
+      commentedSort,
       MOST_COMMENTED_FILMS,
       this._commentedFilmPresenter,
     );
   }
 
   _renderFooter(films) {
-    this._numbersFilms = new NumbersFilms(films);
+    this._totalMoviesCount = new TotalMoviesCount(films);
     const siteFooterElement = document.querySelector('.footer');
     const siteFooterSectionElement = siteFooterElement.querySelector('.footer__statistics');
-    render(siteFooterSectionElement, this._numbersFilms, renderPosition.BEFOREEND);
+    render(siteFooterSectionElement, this._totalMoviesCount, renderPosition.BEFOREEND);
   }
 
   _renderPage() {
@@ -268,7 +262,7 @@ export default class Page {
       this._renderFilmList();
       this._renderAdditionalFilmsBlock();
 
-      this._renderFooter(this._filmsModel.getFilms());
+      this._renderFooter(this._moviesModel.getFilms());
     }
   }
 

@@ -1,4 +1,4 @@
-import { generateRuntime, getDayMonthFormat, getYearsFormat } from '../utils/utils.js';
+import { generateRuntime, getDayMonthFormat, getYearsFormat } from '../utils/common.js';
 import Smart from './smart.js';
 import { UserAction, UpdateType } from '../constants.js';
 import he from 'he';
@@ -155,7 +155,7 @@ export default class Popup extends Smart {
     this._sendCommentHandler = this._sendCommentHandler.bind(this);
     this._textInputHandler = this._textInputHandler.bind(this);
     this._emojiHandler = this._emojiHandler.bind(this);
-    this._deleteCommentHandlers = this._deleteCommentHandlers.bind(this);
+    this._deleteCommentHandler = this._deleteCommentHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -228,27 +228,13 @@ export default class Popup extends Smart {
     );
   }
 
-  static parseDataToFilm(data) {
-    data = Object.assign({}, data);
-    if (!data.isComments) {
-      data.comments = [];
-    }
-    if (data.scrollPosition) {
-      delete data.scrollPosition;
-    }
-    delete data.isComments;
-    delete data.isDisabled;
-    delete data.deletingId;
-    return data;
-  }
-
   _setInnerHandlers() {
     this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._emojiHandler);
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._textInputHandler);
     document.addEventListener('keydown', this._sendCommentHandler);
 
     const buttons = this.getElement().querySelectorAll('.film-details__comment-delete');
-    Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandlers));
+    Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandler));
   }
 
   _textInputHandler(evt) {
@@ -342,7 +328,7 @@ export default class Popup extends Smart {
     this.updateElement();
   }
 
-  _deleteCommentHandlers(evt) {
+  _deleteCommentHandler(evt) {
     evt.preventDefault();
     this._scrollPosition = this.getElement().scrollTop;
     const updatedComments = this._delete(this._data.comments, evt.target.id);

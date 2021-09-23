@@ -1,5 +1,6 @@
-import { render, renderPosition, remove, replace, isEscEvent } from '../utils/utils.js';
-import Card from '../view/movie-card';
+import { render, renderPosition, remove, replace } from '../utils/render.js';
+import { isEscEvent } from '../utils/common.js';
+import Card from '../view/card';
 import Popup from '../view/popup.js';
 import { Mode, UserAction, UpdateType, Pages } from '../constants.js';
 

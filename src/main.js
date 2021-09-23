@@ -1,12 +1,12 @@
-import Page from './presenter/movie-page.js';
-import Statistic from './view/stats.js';
-import FilterNav from './presenter/filters-navigation.js';
-import MoviesModel from './model/movies.js';
-import CommentsModel from './model/comments.js';
-import PageModel from './model/filters.js';
+import Page from './presenter/page.js';
+import Statistic from './view/statistic.js';
+import FilterNavigation from './presenter/filter-navigation.js';
+import MoviesModel from './model/movies-model.js';
+import CommentsModel from './model/comments-model.js';
+import PageModel from './model/page-model.js';
 import Api from './api.js';
 
-import { render, remove, renderPosition } from './utils/utils.js';
+import { render, renderPosition, remove } from './utils/render.js';
 import { Pages, UpdateType } from './constants.js';
 
 
@@ -20,16 +20,11 @@ const mainElement = document.querySelector('.main');
 const filmsModel = new MoviesModel();
 const commentsModel = new CommentsModel();
 const pageModel = new PageModel();
+const statisticElement = new Statistic();
 
 const pagePresenter = new Page(mainElement, filmsModel, commentsModel, pageModel, api, headerElement);
-const filterPresenter = new FilterNav(mainElement, pageModel, filmsModel, handleMenuClick);
 
-
-filterPresenter.init();
-const statisticElement = new Statistic();
-pagePresenter.init();
-
-function handleMenuClick(filterType) {
+const handleMenuClick = (filterType) => {
   if (filterType === Pages.STATISTIC) {
     render(mainElement, statisticElement, renderPosition.BEFOREEND);
     statisticElement.init(filmsModel);
@@ -39,7 +34,12 @@ function handleMenuClick(filterType) {
   }
   pagePresenter.show();
   remove(statisticElement);
-}
+};
+
+const filterPresenter = new FilterNavigation(mainElement, pageModel, filmsModel, handleMenuClick);
+
+filterPresenter.init();
+pagePresenter.init();
 
 api.getFilms()
   .then((films) => {

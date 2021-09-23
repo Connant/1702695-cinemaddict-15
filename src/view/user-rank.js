@@ -1,7 +1,7 @@
 import Abstract from './abstract.js';
 import { UserLevel } from '../constants';
 
-export const userRunkTemplate = (films) => {
+export const userRankTemplate = (films) => {
 
   const getProfileRating = (elements) => {
     if (elements >= 1 && elements < 10) {
@@ -10,7 +10,7 @@ export const userRunkTemplate = (films) => {
     if (elements >= 10 && elements < 20) {
       return UserLevel.FAN;
     }
-    if (elements >= 21) {
+    if (elements >= 20) {
       return UserLevel.MOVIE_BUFF;
     }
     if (elements === 0) {
@@ -25,13 +25,13 @@ export const userRunkTemplate = (films) => {
     <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
   </section>`;
 };
-export default class UserRunk extends Abstract {
+export default class UserRank extends Abstract {
   constructor(films) {
     super();
     this._films = films;
   }
 
   getTemplate() {
-    return userRunkTemplate(this._films);
+    return userRankTemplate(this._films);
   }
 }

@@ -3,7 +3,7 @@ import Abstract from './abstract.js';
 
 export const showMoreButtonTemplate = () => '<button class="films-list__show-more">Show more</button>';
 
-export default class Button extends Abstract {
+export default class ShowMoreButton extends Abstract {
   constructor() {
     super();
     this._clickHandler = this._clickHandler.bind(this);

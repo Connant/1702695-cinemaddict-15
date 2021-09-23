@@ -4,7 +4,7 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { Pages, CurrentType, UserLevel } from '../constants';
-import { filter, getNumberFilmsGenre, getSortGenresFilms, completedFimsInDateRange } from '../utils/utils';
+import { getNumberFilmsGenre, getSortGenresFilms, completedFilmsInDateRange, filter } from '../utils/filters.js';
 
 const createFilmsChart = (statisticCtx, genresByFilms) => {
   const BAR_HEIGHT = 50;
@@ -78,7 +78,7 @@ const createRankTitle = (historyFilms) => {
     if (elements >= 10 && elements < 20) {
       return UserLevel.FAN;
     }
-    if (elements >= 21) {
+    if (elements >= 20) {
       return UserLevel.MOVIE_BUFF;
     }
     if (elements === 0) {
@@ -162,11 +162,11 @@ export default class Statistic extends Smart {
     this._dateChangeHandler = this._dateChangeHandler.bind(this);
   }
 
-  init(filmsModel) {
-    this._filmsModel = filmsModel;
+  init(moviesModel) {
+    this._moviesModel = moviesModel;
     this._sortGenres = null;
     this._data = {
-      films: this._filmsModel.getFilms(),
+      films: this._moviesModel.getFilms(),
       currentType: CurrentType.ALL,
       genre: this._sortGenres,
     };
@@ -212,7 +212,7 @@ export default class Statistic extends Smart {
     evt.preventDefault();
     switch (evt.target.value) {
       case CurrentType.ALL:
-        this._getWatchedFilms(this._filmsModel.getFilms());
+        this._getWatchedFilms(this._moviesModel.getFilms());
         this.updateData(Object.assign({},
           this._data,
           {
@@ -222,7 +222,7 @@ export default class Statistic extends Smart {
         this.setData();
         break;
       case CurrentType.TODAY:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._today, this._endToday, 'hour minute');
+        this._sortFilms = completedFilmsInDateRange(this._moviesModel.getFilms(), this._today, this._endToday, 'hour minute');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign(
           {},
@@ -235,7 +235,7 @@ export default class Statistic extends Smart {
         this.setData();
         break;
       case CurrentType.WEEK:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._endToday, 'month day');
+        this._sortFilms = completedFilmsInDateRange(this._moviesModel.getFilms(), this._week, this._endToday, 'month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -247,7 +247,7 @@ export default class Statistic extends Smart {
         break;
 
       case CurrentType.MONTH:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastMonth, this._endToday, 'month day');
+        this._sortFilms = completedFilmsInDateRange(this._moviesModel.getFilms(), this._lastMonth, this._endToday, 'month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -259,7 +259,7 @@ export default class Statistic extends Smart {
         break;
 
       case CurrentType.YEAR:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastYear, this._endToday, 'year month day');
+        this._sortFilms = completedFilmsInDateRange(this._moviesModel.getFilms(), this._lastYear, this._endToday, 'year month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {

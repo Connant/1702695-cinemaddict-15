@@ -1,16 +1,16 @@
 import Abstract from './abstract';
 
-const createNumbersFilms = (films) => (
+const createTotalMoviesCount = (films) => (
   `<p>${films.length} movies inside</p>`
 );
 
-export default class NumbersFilms extends Abstract {
+export default class TotalMoviesCount extends Abstract {
   constructor(films) {
     super();
     this._films = films;
   }
 
   getTemplate() {
-    return createNumbersFilms(this._films);
+    return createTotalMoviesCount(this._films);
   }
 }
